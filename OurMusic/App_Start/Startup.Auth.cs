@@ -32,7 +32,9 @@ namespace OurMusic
             //   appId: "",
             //   appSecret: "");
 
-            //app.UseGoogleAuthentication();
+            app.UseGoogleAuthentication(
+                clientId: "17805184872-8hdv987er9aqh74727tlddkiooh160km.apps.googleusercontent.com",
+                clientSecret: "SJnxwIQVni4DVQQrzvTd_Pxs");
         }
     }
 }
