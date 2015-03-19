@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using OurMusic.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,23 +12,23 @@ namespace OurMusic.Controllers
     [Authorize]
     public class HomeController : Controller
     {
+        private OurMusicEntities db = new OurMusicEntities();
+        public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+        private string LOGGEDIN_USER;
         public ActionResult Index()
         {
-            return View();
+            Person p = getLoggedInPerson();
+            ViewBag.LoggedInPerson = p;
+            var rooms = db.Rooms.ToList();
+            return View(rooms);
         }
 
-        public ActionResult About()
+        private Person getLoggedInPerson()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            ApplicationUser user = umanager.FindById(User.Identity.GetUserId());
+            var person = db.People.Where(x => x.userName == user.UserName).FirstOrDefault();
+            return person;
         }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
+    
     }
 }

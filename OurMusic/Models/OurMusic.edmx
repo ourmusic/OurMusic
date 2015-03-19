@@ -4,20 +4,226 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="OurMusicModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityContainer Name="OurMusicModelStoreContainer" />
-      </Schema>
-    </edmx:StorageModels>
+    <Schema Namespace="OurMusicModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="userID" />
+          </Key>
+          <Property Name="userID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="firstName" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="lastName" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="userName" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="password" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="signupDate" Type="datetime" Nullable="false" />
+          <Property Name="activeRoom" Type="uniqueidentifier" />
+        </EntityType>
+        <EntityType Name="Room">
+          <Key>
+            <PropertyRef Name="roomid" />
+          </Key>
+          <Property Name="roomid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="isPrivate" Type="bit" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="administrator" Type="uniqueidentifier" />
+        </EntityType>
+        <EntityType Name="Song">
+          <Key>
+            <PropertyRef Name="songId" />
+          </Key>
+          <Property Name="songId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="songURL" Type="text" Nullable="false" />
+          <Property Name="upvoteCount" Type="int" Nullable="false" />
+          <Property Name="downvoteCount" Type="int" Nullable="false" />
+          <Property Name="room_id" Type="uniqueidentifier" />
+        </EntityType>
+        <Association Name="FK__Person__activeRo__46E78A0C">
+          <End Role="Room" Type="Self.Room" Multiplicity="0..1" />
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Room">
+              <PropertyRef Name="roomid" />
+            </Principal>
+            <Dependent Role="Person">
+              <PropertyRef Name="activeRoom" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Room__administra__4316F928">
+          <End Role="Person" Type="Self.Person" Multiplicity="0..1" />
+          <End Role="Room" Type="Self.Room" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="userID" />
+            </Principal>
+            <Dependent Role="Room">
+              <PropertyRef Name="administrator" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Song__room_id__45F365D3">
+          <End Role="Room" Type="Self.Room" Multiplicity="0..1" />
+          <End Role="Song" Type="Self.Song" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Room">
+              <PropertyRef Name="roomid" />
+            </Principal>
+            <Dependent Role="Song">
+              <PropertyRef Name="room_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="OurMusicModelStoreContainer">
+          <EntitySet Name="Person" EntityType="Self.Person" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Room" EntityType="Self.Room" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Song" EntityType="Self.Song" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Person__activeRo__46E78A0C" Association="Self.FK__Person__activeRo__46E78A0C">
+            <End Role="Room" EntitySet="Room" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Room__administra__4316F928" Association="Self.FK__Room__administra__4316F928">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="Room" EntitySet="Room" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Song__room_id__45F365D3" Association="Self.FK__Song__room_id__45F365D3">
+            <End Role="Room" EntitySet="Room" />
+            <End Role="Song" EntitySet="Song" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="OurMusicModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="OurMusicEntities" annotation:LazyLoadingEnabled="true" />
-      </Schema>
+        <EntityContainer Name="OurMusicEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="People" EntityType="OurMusicModel.Person" />
+          <EntitySet Name="Rooms" EntityType="OurMusicModel.Room" />
+          <EntitySet Name="Songs" EntityType="OurMusicModel.Song" />
+          <AssociationSet Name="FK__Person__activeRo__46E78A0C" Association="OurMusicModel.FK__Person__activeRo__46E78A0C">
+            <End Role="Room" EntitySet="Rooms" />
+            <End Role="Person" EntitySet="People" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Room__administra__4316F928" Association="OurMusicModel.FK__Room__administra__4316F928">
+            <End Role="Person" EntitySet="People" />
+            <End Role="Room" EntitySet="Rooms" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Song__room_id__45F365D3" Association="OurMusicModel.FK__Song__room_id__45F365D3">
+            <End Role="Room" EntitySet="Rooms" />
+            <End Role="Song" EntitySet="Songs" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="userID" />
+          </Key>
+          <Property Name="userID" Type="Guid" Nullable="false" />
+          <Property Name="firstName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="lastName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="userName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="signupDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="activeRoom" Type="Guid" />
+          <NavigationProperty Name="Room" Relationship="OurMusicModel.FK__Person__activeRo__46E78A0C" FromRole="Person" ToRole="Room" />
+          <NavigationProperty Name="Rooms" Relationship="OurMusicModel.FK__Room__administra__4316F928" FromRole="Person" ToRole="Room" />
+        </EntityType>
+        <EntityType Name="Room">
+          <Key>
+            <PropertyRef Name="roomid" />
+          </Key>
+          <Property Name="roomid" Type="Guid" Nullable="false" />
+          <Property Name="isPrivate" Type="Boolean" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="administrator" Type="Guid" />
+          <NavigationProperty Name="People" Relationship="OurMusicModel.FK__Person__activeRo__46E78A0C" FromRole="Room" ToRole="Person" />
+          <NavigationProperty Name="Person" Relationship="OurMusicModel.FK__Room__administra__4316F928" FromRole="Room" ToRole="Person" />
+          <NavigationProperty Name="Songs" Relationship="OurMusicModel.FK__Song__room_id__45F365D3" FromRole="Room" ToRole="Song" />
+        </EntityType>
+        <EntityType Name="Song">
+          <Key>
+            <PropertyRef Name="songId" />
+          </Key>
+          <Property Name="songId" Type="Guid" Nullable="false" />
+          <Property Name="songURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="upvoteCount" Type="Int32" Nullable="false" />
+          <Property Name="downvoteCount" Type="Int32" Nullable="false" />
+          <Property Name="room_id" Type="Guid" />
+          <NavigationProperty Name="Room" Relationship="OurMusicModel.FK__Song__room_id__45F365D3" FromRole="Song" ToRole="Room" />
+        </EntityType>
+        <Association Name="FK__Person__activeRo__46E78A0C">
+          <End Type="OurMusicModel.Room" Role="Room" Multiplicity="0..1" />
+          <End Type="OurMusicModel.Person" Role="Person" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Room">
+              <PropertyRef Name="roomid" />
+            </Principal>
+            <Dependent Role="Person">
+              <PropertyRef Name="activeRoom" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Room__administra__4316F928">
+          <End Type="OurMusicModel.Person" Role="Person" Multiplicity="0..1" />
+          <End Type="OurMusicModel.Room" Role="Room" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="userID" />
+            </Principal>
+            <Dependent Role="Room">
+              <PropertyRef Name="administrator" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Song__room_id__45F365D3">
+          <End Type="OurMusicModel.Room" Role="Room" Multiplicity="0..1" />
+          <End Type="OurMusicModel.Song" Role="Song" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Room">
+              <PropertyRef Name="roomid" />
+            </Principal>
+            <Dependent Role="Song">
+              <PropertyRef Name="room_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="OurMusicModelStoreContainer" CdmEntityContainer="OurMusicEntities" />
+        <EntityContainerMapping StorageEntityContainer="OurMusicModelStoreContainer" CdmEntityContainer="OurMusicEntities" >
+          <EntitySetMapping Name="People">
+            <EntityTypeMapping TypeName="OurMusicModel.Person">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="activeRoom" ColumnName="activeRoom" />
+                <ScalarProperty Name="signupDate" ColumnName="signupDate" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="userName" ColumnName="userName" />
+                <ScalarProperty Name="lastName" ColumnName="lastName" />
+                <ScalarProperty Name="firstName" ColumnName="firstName" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Rooms">
+            <EntityTypeMapping TypeName="OurMusicModel.Room">
+              <MappingFragment StoreEntitySet="Room">
+                <ScalarProperty Name="administrator" ColumnName="administrator" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="isPrivate" ColumnName="isPrivate" />
+                <ScalarProperty Name="roomid" ColumnName="roomid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Songs">
+            <EntityTypeMapping TypeName="OurMusicModel.Song">
+              <MappingFragment StoreEntitySet="Song">
+                <ScalarProperty Name="room_id" ColumnName="room_id" />
+                <ScalarProperty Name="downvoteCount" ColumnName="downvoteCount" />
+                <ScalarProperty Name="upvoteCount" ColumnName="upvoteCount" />
+                <ScalarProperty Name="songURL" ColumnName="songURL" />
+                <ScalarProperty Name="songId" ColumnName="songId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

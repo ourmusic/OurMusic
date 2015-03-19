@@ -1,0 +1,51 @@
+﻿@model IEnumerable<OurMusic.Models.Room>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.isPrivate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Person.firstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Room2.name)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.isPrivate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Person.firstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Room2.name)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.roomid }) |
+            @Html.ActionLink("Details", "Details", new { id=item.roomid }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.roomid })
+        </td>
+    </tr>
+}
+
+</table>

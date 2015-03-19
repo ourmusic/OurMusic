@@ -4,7 +4,14 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="db0a6afa43d64e028ea146c65c73e44e" Name="Diagram1" />
+      <Diagram DiagramId="db0a6afa43d64e028ea146c65c73e44e" Name="Diagram1" >
+        <EntityTypeShape EntityType="OurMusicModel.Person" Width="1.5" PointX="3" PointY="4" />
+        <EntityTypeShape EntityType="OurMusicModel.Room" Width="1.5" PointX="0.75" PointY="2.75" />
+        <EntityTypeShape EntityType="OurMusicModel.Song" Width="1.5" PointX="3" PointY="1.125" />
+        <AssociationConnector Association="OurMusicModel.FK__Person__activeRo__46E78A0C" />
+        <AssociationConnector Association="OurMusicModel.FK__Room__administra__4316F928" />
+        <AssociationConnector Association="OurMusicModel.FK__Song__room_id__45F365D3" />
+      </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

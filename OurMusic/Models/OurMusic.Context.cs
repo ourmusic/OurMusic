@@ -25,5 +25,8 @@ namespace OurMusic.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Person> People { get; set; }
+        public virtual DbSet<Room> Rooms { get; set; }
+        public virtual DbSet<Song> Songs { get; set; }
     }
 }

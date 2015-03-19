@@ -1,0 +1,66 @@
+﻿@model OurMusic.Models.Room
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Room</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.roomid)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.isPrivate, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.isPrivate)
+                @Html.ValidationMessageFor(model => model.isPrivate)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.name, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.name)
+                @Html.ValidationMessageFor(model => model.name)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.administrator, "administrator", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("administrator", String.Empty)
+                @Html.ValidationMessageFor(model => model.administrator)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.activeRoom, "activeRoom", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("activeRoom", String.Empty)
+                @Html.ValidationMessageFor(model => model.activeRoom)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

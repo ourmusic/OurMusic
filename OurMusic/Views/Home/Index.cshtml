@@ -1,23 +1,28 @@
-﻿
+﻿@using OurMusic.Models
+@model List<OurMusic.Models.Room>
 @{
     ViewBag.Title = "Home";
+    Person p = ViewBag.LoggedInPerson;
 }
 <div class="row">
 <div class="col-lg-4">
+    @if(Model.Count >= 1)
+    { 
     <ul class="list-group">
-        <li class="list-group-item">
-            <span class="badge">14</span>
-            I am a room.
-        </li>
-        <li class="list-group-item">
-            <span class="badge">2</span>
-            I am not connected to a database though :(
-        </li>
-        <li class="list-group-item">
-            <span class="badge">1</span>
-            I am another room.
-        </li>
+        @foreach (var x in Model)
+        {
+            <li class="list-group-item">
+                <span class="badge">@x.People.Count</span>
+                @Html.ActionLink(x.name, "Join", "Room", new { personid = p.userID, id = x.roomid }, new { })
+            </li>            
+        }
+
     </ul>
+    }
+    else
+    {
+        <small>There are no rooms here! Would you like to @Html.ActionLink("create a room","Create","Room")?</small>
+    }
 </div>
 <div class="col-lg-8">
 <div class="alert alert-dismissible alert-info">
