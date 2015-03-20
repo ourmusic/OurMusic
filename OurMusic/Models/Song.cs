@@ -19,6 +19,7 @@ namespace OurMusic.Models
         public int upvoteCount { get; set; }
         public int downvoteCount { get; set; }
         public Nullable<System.Guid> room_id { get; set; }
+        public Nullable<int> queue_order { get; set; }
     
         public virtual Room Room { get; set; }
     }

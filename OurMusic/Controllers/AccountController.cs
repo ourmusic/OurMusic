@@ -15,6 +15,7 @@ namespace OurMusic.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        private OurMusicEntities db = new OurMusicEntities();
         public AccountController()
             : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())))
         {
@@ -79,6 +80,15 @@ namespace OurMusic.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser() { UserName = model.UserName };
+                var person = new Person();
+                person.userID = Guid.NewGuid();
+                person.firstName = model.FirstName;
+                person.lastName = model.LastName;
+                person.password = model.Password;
+                person.signupDate = DateTime.Now;
+                person.userName = model.UserName;
+                db.People.Add(person);
+                var res1 = await db.SaveChangesAsync();
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

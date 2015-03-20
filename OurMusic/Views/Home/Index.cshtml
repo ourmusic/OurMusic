@@ -13,7 +13,14 @@
         {
             <li class="list-group-item">
                 <span class="badge">@x.People.Count</span>
-                @Html.ActionLink(x.name, "Join", "Room", new { personid = p.userID, id = x.roomid }, new { })
+                @x.name&nbsp;&nbsp;
+                @if(!x.People.Contains(p))
+                {
+                    <span>@Html.ActionLink("Join", "Join", "Room", new { personid = p.userID, id = x.roomid }, new { })</span>
+                }
+                else {
+                    <span>@Html.ActionLink("View", "Details", "Room", new { id = x.roomid }, new { })</span>
+                }
             </li>            
         }
 
@@ -27,7 +34,7 @@
 <div class="col-lg-8">
 <div class="alert alert-dismissible alert-info">
     <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>Hey there!</strong> It looks like you are new. To get started, <a href="#" class="alert-link">create a room</a>, or join one of the rooms over on the sidebar!
+    <strong>Hey there!</strong> It looks like you are new. To get started, @Html.ActionLink("create a room", "Create", "Room"), or join one of the rooms over on the sidebar!
 </div>
 </div>
 </div>

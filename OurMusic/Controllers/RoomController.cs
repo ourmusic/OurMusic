@@ -60,7 +60,7 @@ namespace OurMusic.Controllers
             }
 
             ViewBag.administrator = new SelectList(db.People, "userID", "firstName", room.administrator);
-            return View(room);
+            return RedirectToAction("Details", new { id = room.roomid });
         }
 
         // GET: /Room/Edit/5

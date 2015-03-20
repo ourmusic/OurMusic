@@ -35,6 +35,7 @@
           <Property Name="upvoteCount" Type="int" Nullable="false" />
           <Property Name="downvoteCount" Type="int" Nullable="false" />
           <Property Name="room_id" Type="uniqueidentifier" />
+          <Property Name="queue_order" Type="int" />
         </EntityType>
         <Association Name="FK__Person__activeRo__46E78A0C">
           <End Role="Room" Type="Self.Room" Multiplicity="0..1" />
@@ -96,7 +97,6 @@
         <EntityContainer Name="OurMusicEntities" annotation:LazyLoadingEnabled="true" >
           <EntitySet Name="People" EntityType="OurMusicModel.Person" />
           <EntitySet Name="Rooms" EntityType="OurMusicModel.Room" />
-          <EntitySet Name="Songs" EntityType="OurMusicModel.Song" />
           <AssociationSet Name="FK__Person__activeRo__46E78A0C" Association="OurMusicModel.FK__Person__activeRo__46E78A0C">
             <End Role="Room" EntitySet="Rooms" />
             <End Role="Person" EntitySet="People" />
@@ -105,6 +105,7 @@
             <End Role="Person" EntitySet="People" />
             <End Role="Room" EntitySet="Rooms" />
           </AssociationSet>
+          <EntitySet Name="Songs" EntityType="OurMusicModel.Song" />
           <AssociationSet Name="FK__Song__room_id__45F365D3" Association="OurMusicModel.FK__Song__room_id__45F365D3">
             <End Role="Room" EntitySet="Rooms" />
             <End Role="Song" EntitySet="Songs" />
@@ -136,17 +137,6 @@
           <NavigationProperty Name="Person" Relationship="OurMusicModel.FK__Room__administra__4316F928" FromRole="Room" ToRole="Person" />
           <NavigationProperty Name="Songs" Relationship="OurMusicModel.FK__Song__room_id__45F365D3" FromRole="Room" ToRole="Song" />
         </EntityType>
-        <EntityType Name="Song">
-          <Key>
-            <PropertyRef Name="songId" />
-          </Key>
-          <Property Name="songId" Type="Guid" Nullable="false" />
-          <Property Name="songURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="upvoteCount" Type="Int32" Nullable="false" />
-          <Property Name="downvoteCount" Type="Int32" Nullable="false" />
-          <Property Name="room_id" Type="Guid" />
-          <NavigationProperty Name="Room" Relationship="OurMusicModel.FK__Song__room_id__45F365D3" FromRole="Song" ToRole="Room" />
-        </EntityType>
         <Association Name="FK__Person__activeRo__46E78A0C">
           <End Type="OurMusicModel.Room" Role="Room" Multiplicity="0..1" />
           <End Type="OurMusicModel.Person" Role="Person" Multiplicity="*" />
@@ -171,6 +161,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Song">
+          <Key>
+            <PropertyRef Name="songId" />
+          </Key>
+          <Property Name="songId" Type="Guid" Nullable="false" />
+          <Property Name="songURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="upvoteCount" Type="Int32" Nullable="false" />
+          <Property Name="downvoteCount" Type="Int32" Nullable="false" />
+          <Property Name="room_id" Type="Guid" />
+          <Property Name="queue_order" Type="Int32" />
+          <NavigationProperty Name="Room" Relationship="OurMusicModel.FK__Song__room_id__45F365D3" FromRole="Song" ToRole="Room" />
+        </EntityType>
         <Association Name="FK__Song__room_id__45F365D3">
           <End Type="OurMusicModel.Room" Role="Room" Multiplicity="0..1" />
           <End Type="OurMusicModel.Song" Role="Song" Multiplicity="*" />
@@ -215,6 +217,7 @@
           <EntitySetMapping Name="Songs">
             <EntityTypeMapping TypeName="OurMusicModel.Song">
               <MappingFragment StoreEntitySet="Song">
+                <ScalarProperty Name="queue_order" ColumnName="queue_order" />
                 <ScalarProperty Name="room_id" ColumnName="room_id" />
                 <ScalarProperty Name="downvoteCount" ColumnName="downvoteCount" />
                 <ScalarProperty Name="upvoteCount" ColumnName="upvoteCount" />
