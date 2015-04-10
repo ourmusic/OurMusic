@@ -8,18 +8,28 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using OurMusic.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace OurMusic.Controllers
 {
     public class RoomController : Controller
     {
         private OurMusicEntities db = new OurMusicEntities();
-
+        public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+        private string LOGGEDIN_USER;
         // GET: /Room/
         public async Task<ActionResult> Index()
         {
             var rooms = db.Rooms.Include(r => r.Person);
             return View(await rooms.ToListAsync());
+        }
+
+        private Person getLoggedInPerson()
+        {
+            ApplicationUser user = umanager.FindById(User.Identity.GetUserId());
+            var person = db.People.Where(x => x.userName == user.UserName).FirstOrDefault();
+            return person;
         }
 
         // GET: /Room/Details/5
@@ -56,7 +66,10 @@ namespace OurMusic.Controllers
                 room.roomid = Guid.NewGuid();
                 db.Rooms.Add(room);
                 await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                var roomtest = db.Rooms.Where(x => x.roomid == room.roomid).FirstOrDefault();
+                roomtest.People.Add(getLoggedInPerson());
+                await db.SaveChangesAsync();
+                return RedirectToAction("Details", new { id = room.roomid });
             }
 
             ViewBag.administrator = new SelectList(db.People, "userID", "firstName", room.administrator);
