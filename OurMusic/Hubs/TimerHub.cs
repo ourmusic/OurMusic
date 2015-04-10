@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
+using OurMusic.Models;
 using System.Timers;
 
 namespace OurMusic.Hubs
@@ -12,6 +14,8 @@ namespace OurMusic.Hubs
     {
         private static Timer _timer = new Timer();
 
+        private static VideoQueue videoQueue = new VideoQueue(true);
+
         /// <summary>
         /// Starts the countdown timer for the video to finish.
         /// Used by the play.js file which handles the client-server communication functions
@@ -19,7 +23,7 @@ namespace OurMusic.Hubs
         /// <param name="seconds">Video duration</param>
         public void StartCountDown(int seconds)
         {
-            _timer.Interval = ((seconds + 2) * 1000);
+            _timer.Interval = (seconds + 2) * 1000;
             _timer.Elapsed += new ElapsedEventHandler(_timer_Done);
             _timer.Start();
         }
@@ -34,6 +38,7 @@ namespace OurMusic.Hubs
             _timer.Stop();
             String video = GetNextVideo();
             Clients.All.change(video);
+
         }
 
         /// <summary>
@@ -45,7 +50,25 @@ namespace OurMusic.Hubs
         /// <returns>The next video ID in the queue</returns>
         public String GetNextVideo()
         {
-            return "Xpe-JoGyPsY";
+            if (videoQueue.getLength() == 0)
+            {
+                return "Xpe-JoGyPsY";
+            }
+            Video toPlay = videoQueue.removeFirstVideo();
+            return toPlay.getUrl();
+        }
+
+        /**
+         * Adds a video to the queue based on user input video title and url
+         * Called by client javascript
+         * */
+        public void addToQueue(string vidTitle, string vidUrl)
+        {
+            Video newVid = new Video(vidTitle, vidUrl);
+            videoQueue.addVideo(newVid);
+
+            string jsonOfQueue = videoQueue.jsonQueue();
+            Clients.All.refreshList(jsonOfQueue);
         }
 
     }

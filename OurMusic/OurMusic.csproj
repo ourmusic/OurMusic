@@ -189,6 +189,7 @@
     </Compile>
     <Compile Include="Hubs\TimerHub.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Video.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\OurMusic.Context.cs">
       <AutoGen>True</AutoGen>
@@ -214,6 +215,7 @@
     <Compile Include="Models\Song.cs">
       <DependentUpon>OurMusic.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\VideoQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -270,6 +272,7 @@
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\play.js" />
+    <Content Include="Scripts\queue.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />

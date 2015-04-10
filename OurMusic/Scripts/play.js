@@ -11,8 +11,7 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: '2Jp5IZYyma4'
-
+        videoId: 'Ihzp55Cuo7M'
     });
 }
 
@@ -21,19 +20,20 @@ $(function () {
     var prox = $.connection.timerHub;
 
     function init() {
-        time = player.getDuration();
         player.playVideo();
+        time = player.getDuration();
         prox.server.startCountDown(time);
     }
 
     prox.client.change = function (video) {
-        player.cueVideoById(video);
-        time = player.getDuration();
-        player.playVideo();
-        prox.server.startCountDown(time);
+        player.loadVideoById(video);
+        setTimeout(getTime, 2000);
     }
 
-
+    function getTime() {
+        time = player.getDuration();
+        prox.server.startCountDown(time);
+    }
 
     $.connection.hub.start().done(init);
 });
