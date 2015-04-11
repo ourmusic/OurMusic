@@ -41,15 +41,52 @@
 
 <div id="player"></div>
 <div>
-    <input type="text" id="vidTitle" />
-    <input type="text" id="vidUrl" />
-    <input type="button" id="addVideo" value="Add To Queue" />
+    <input type="text" id="searchQuery" placeholder="Enter Search Query Here" size="35"/>
+    <button id="searchButton" onclick="search()">Search Video</button><br />
+    <br />
+    <input type="text" id="vidTitle" placeholder="Video Title" size="35" disabled/><br />
+    <input type="text" id="vidUrl" placeholder ="Video URL" size="35" disabled/>
+    <input type="button" id="addVideo" value="Add To Queue" disabled/><br />
     <ul id="queueString"></ul>
 </div>
 <script src="/Scripts/jquery-1.10.2.min.js"></script>
 <script src="/Scripts/jquery.signalR-2.2.0.js"></script>
 <script src="/signalr/hubs"></script>
 <script src="/Scripts/play.js"></script>
+<script type="text/javascript">
+    function search() {
+        var query = document.getElementById("searchQuery").value;
+        var feedURL = "https://gdata.youtube.com/feeds/api/videos?q=" + query + "&max-results=1&output=embed/";
+
+        var x = new XMLHttpRequest();
+        x.open("GET", feedURL, true);
+        x.send();
+        x.onreadystatechange = function () {
+            if (x.readyState == 4 && x.status == 200) {
+                var xml_doc = x.responseXML;
+                var entry_nodes = xml_doc.documentElement.lastChild.childNodes;
+                var video_id_raw = "" + entry_nodes[0].firstChild.nodeValue;
+                var video_id = video_id_raw.replace("http://gdata.youtube.com/feeds/api/videos/", "");
+
+                var video_title = "";
+
+                for (i = 0; i < entry_nodes.length; i++) {
+                    if (entry_nodes[i].nodeName === "title")
+                        video_title = "" + entry_nodes[i].firstChild.nodeValue;
+                }
+
+                if (video_title === "")
+                    video_title = "undefined title";
+
+                document.getElementById("vidUrl").value = "" + video_id;
+                document.getElementById("vidTitle").value = "" + video_title;
+                document.getElementById("addVideo").disabled = false;
+            }
+        };
+
+    }
+</script>
+
 <script>
     $(function () {
         // Reference the auto-generated proxy for the hub.
