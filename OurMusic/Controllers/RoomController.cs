@@ -68,6 +68,7 @@ namespace OurMusic.Controllers
                 await db.SaveChangesAsync();
                 var roomtest = db.Rooms.Where(x => x.roomid == room.roomid).FirstOrDefault();
                 roomtest.People.Add(getLoggedInPerson());
+                roomtest.administrator = getLoggedInPerson().userID;
                 await db.SaveChangesAsync();
                 return RedirectToAction("Details", new { id = room.roomid });
             }
