@@ -127,6 +127,15 @@ namespace OurMusic.Models
         {
             this.votes--;
         }
+
+        /*
+         * when a user has a video downvoted, and then clicks upvote, this triggers a 2 vote swing;
+         * int voteUpOrDown will be positive for upvotes, negative for downvotes
+         */
+        public void vote(int votesUpOrDown)
+        {
+            this.votes += votesUpOrDown;
+        }
     }
 
 }

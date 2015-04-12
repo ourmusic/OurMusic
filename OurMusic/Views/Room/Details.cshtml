@@ -7,6 +7,8 @@
     String id = ViewBag.Person.userID.ToString();
 }
 
+
+
 <div class="row">
     <h1>@Model.name</h1>
     <div class="col-lg-4">
@@ -50,7 +52,18 @@
     <input type="text" id="vidTitle" placeholder="Video Title" size="35" disabled/><br />
     <input type="text" id="vidUrl" placeholder ="Video URL" size="35" disabled/>
     <input type="button" id="addVideo" value="Add To Queue" disabled/><br />
-    <ul id="queueString"></ul>
+    <table id="queueList" class="table">
+        <thead>
+            <tr>
+                <th>Video Title</th>
+                <th>Video URL</th>
+                <th>Votes</th>
+                <th>Upvote</th>
+                <th>Downvote</th>
+            </tr>
+        </thead>
+        <tbody id="tbd"></tbody>
+    </table>
 </div>
 
 <script src="/Scripts/jquery-2.1.3.min.js"></script>
@@ -147,30 +160,4 @@
 </script>
 
 
-<script>
-    $(function () {
-        // Reference the auto-generated proxy for the hub.
-        var tHub = $.connection.timerHub;
-        // Create a function that the hub can call back to display messages.
-        tHub.client.refreshList = function (jsonString) {
-            // Add the message to the page.
-            var parsedList = JSON.parse(jsonString);
-            var qList = document.getElementById("queueString");
-            qList.innerHTML = "";
-            for (i = 0; i < parsedList.length; i++) {
-                qList.innerHTML += "<li> Title: " + parsedList[i].title + "<br>URL: " + parsedList[i].url + "<br>Votes: " + parsedList[i].votes + "</li>"
-            }
-
-        };
-        // Start the connection.
-        $.connection.hub.start().done(function () {
-            $('#addVideo').click(function () {
-                // Call the Send method on the hub.
-                tHub.server.addToQueue($('#vidTitle').val(), $('#vidUrl').val());
-                // Clear text box and reset focus for next comment.
-                $('#vidUrl').val('');
-                $('#vidTitle').val('').focus();
-            });
-        });
-    });
-</script>
+<script src="/Scripts/queue.js"></script>

@@ -66,17 +66,27 @@ namespace OurMusic.Hubs
             return toPlay.getUrl();
         }
 
-        /**
-         * Adds a video to the queue based on user input video title and url
-         * Called by client javascript
-         * */
         public void addToQueue(string vidTitle, string vidUrl)
         {
             Video newVid = new Video(vidTitle, vidUrl);
             videoQueue.addVideo(newVid);
+            Console.WriteLine("in addToQueue");
+            //string jsonOfQueue = videoQueue.jsonQueue();
+            //Clients.All.refreshList(jsonOfQueue);
+            Clients.All.addVideo(vidTitle, vidUrl);
+        }
 
+        public void voteByTitleAndUrl(string vidTitle, string vidUrl, int voteChange)
+        {
+            int movement = videoQueue.vote(vidTitle, vidUrl, voteChange);
+            Clients.All.adjustVotesAndPlacement(vidUrl, voteChange, movement);
+        }
+
+        public void refreshClientQueue()
+        {
             string jsonOfQueue = videoQueue.jsonQueue();
-            Clients.All.refreshList(jsonOfQueue);
+            Clients.Caller.refreshList(jsonOfQueue);
+
         }
 
     }
