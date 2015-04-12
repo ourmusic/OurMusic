@@ -44,6 +44,8 @@ namespace OurMusic.Controllers
             {
                 return HttpNotFound();
             }
+            ViewBag.Room = room;
+            ViewBag.Person = getLoggedInPerson();
             return View(room);
         }
 

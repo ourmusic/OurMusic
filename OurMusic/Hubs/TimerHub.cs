@@ -16,6 +16,15 @@ namespace OurMusic.Hubs
 
         private static VideoQueue videoQueue = new VideoQueue(true);
 
+        public void StartInitCountDown(int seconds)
+        {
+            _timer.Interval = (seconds + 2) * 1000;
+            _timer.Elapsed += new ElapsedEventHandler(_timer_Done);
+            _timer.Start();
+        }
+
+
+
         /// <summary>
         /// Starts the countdown timer for the video to finish.
         /// Used by the play.js file which handles the client-server communication functions
@@ -24,7 +33,6 @@ namespace OurMusic.Hubs
         public void StartCountDown(int seconds)
         {
             _timer.Interval = (seconds + 2) * 1000;
-            _timer.Elapsed += new ElapsedEventHandler(_timer_Done);
             _timer.Start();
         }
 
