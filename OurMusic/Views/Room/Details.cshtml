@@ -4,8 +4,8 @@
 @{
     ViewBag.Title = "Details";
         
-        String admin = ViewBag.Room.administrator.ToString();
-        String id = ViewBag.Person.userID.ToString();
+    String admin = ViewBag.Room.administrator.ToString();
+    String id = ViewBag.Person.userID.ToString();
         
 }
 <head>
@@ -102,8 +102,8 @@
         var prox = $.connection.timerHub;
 
         
-        var admin = 'admin';
-        var id = 'id';
+        var admin = '@admin';
+        var id = '@id';
         
         function init() {
             if (admin == id) {
