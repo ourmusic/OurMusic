@@ -54,41 +54,7 @@ namespace OurMusic.Models
             this.title = title;
         }
 
-        /*
-        public string GetArtist()
-        {
-            return this.artist;
-        }
 
-       
-        public void SetArtist(string artist)
-        {
-            this.artist = artist;
-        }
-        */
-        /// <summary>
-        /// Album Helper Functions
-        /// </summary>
-        /// <returns></returns>
-        /*
-        public string getAlbum()
-        {
-            return this.album;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="album"></param>
-        public void setAlbum(string album)
-        {
-            this.album = album;
-        }
-        */
-        /// <summary>
-        /// URL Helper Functions
-        /// </summary>
-        /// <returns></returns>
         public string getUrl()
         {
             return this.url;
@@ -132,9 +98,9 @@ namespace OurMusic.Models
          * when a user has a video downvoted, and then clicks upvote, this triggers a 2 vote swing;
          * int voteUpOrDown will be positive for upvotes, negative for downvotes
          */
-        public void vote(int votesUpOrDown)
+        public void vote(int votesChange)
         {
-            this.votes += votesUpOrDown;
+            this.votes += votesChange;
         }
     }
 

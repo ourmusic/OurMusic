@@ -50,6 +50,9 @@ namespace OurMusic.Models
             videoList.Remove(l);
 
         }
+        /*
+         * upvotes a video by 1.  implemented before client queue.  not currently used.
+         */
         public void upvote(Video v)
         {
             LinkedListNode<Video> vid = videoList.Find(v);
@@ -57,12 +60,14 @@ namespace OurMusic.Models
             checkOrder(vid);
         }
 
+        //not currently used for iteration 5
         public void upvoteAt(int i)
         {
             Video vid = videoList.ElementAt(i);
             upvote(vid);
         }
 
+        //not currently used for iteration 5
         public void downvote(Video v)
         {
             LinkedListNode<Video> vid = videoList.Find(v);
@@ -70,12 +75,21 @@ namespace OurMusic.Models
             checkOrder(vid);
         }
 
+        //not currently used for iteration 5
         public void downvoteAt(int i)
         {
             Video vid = videoList.ElementAt(i);
             downvote(vid);
         }
 
+        /*
+         * Finds the video in the queue by title and url, then adjusts that video's vote score by voteChange
+         * @param vidTitle title of video to vote on, passed from client javascript to timerhub to this
+         * @param, vidUrl url of video to vote on, passed from client javascript to timerhub to this
+         * @param, voteChange [-2, 2] inclusive vote swing from neutral, downvoted, or upvoted state to a different state
+         * @return the net movement in the queue of the video that was voted on as a result.
+         * Currently does not work for duplicate videos in the queue.
+         */
         public int vote(string vidTitle, string vidUrl, int voteChange)
         {
             LinkedListNode<Video> vid = findByTitleAndUrl(vidTitle, vidUrl);
@@ -85,7 +99,11 @@ namespace OurMusic.Models
         }
 
 
-
+        /*
+         * called in vote.  After a video's vote score is adjusted, checkOrder runs to see if that video needs to move in the queue to maintain sorted scores.
+         * @return the net movement of the video voted on positive return mean the video moved up in the queue, negative return values mean the video moved down
+         * i.e. a return value of 3 means the voted upon video moved up 3 spots in the queue.
+         */
         public int checkOrder(LinkedListNode<Video> vid)
         {
             int movement = 0;
@@ -125,13 +143,16 @@ namespace OurMusic.Models
         public LinkedListNode<Video> findByTitleAndUrl(string searchTitle, string searchURL)
         {
             LinkedListNode<Video> seeker = videoList.First;
-            while (((seeker.Value.getTitle() != searchTitle) || (seeker.Value.getUrl() != searchURL)) && (seeker != null))
+            while ((seeker != null) && ((seeker.Value.getTitle() != searchTitle) || (seeker.Value.getUrl() != searchURL)))
             {
                 seeker = seeker.Next;
             }
             return seeker;
         }
 
+        /*
+         * @return a json representation of the queue in its current state
+         */
         public string jsonQueue()
         {
 

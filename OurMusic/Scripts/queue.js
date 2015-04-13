@@ -31,6 +31,8 @@ $(function () {
 
     tHub.client.adjustVotesAndPlacement = function (videoUrl, votesChange, movement) {
 
+        if (movement == -999) return;
+
         var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
         //alert("movement = " + movement);
         var votesCell = videoRow.cells[2];
