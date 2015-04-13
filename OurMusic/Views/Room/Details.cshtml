@@ -3,8 +3,10 @@
 
 @{
     ViewBag.Title = "Details";
-    String admin = ViewBag.Room.administrator.ToString();
-    String id = ViewBag.Person.userID.ToString();
+        
+        String admin = ViewBag.Room.administrator.ToString();
+        String id = ViewBag.Person.userID.ToString();
+        
 }
 
 
@@ -96,9 +98,11 @@
     //This is where the server-client code goes
     $(function () {
         var prox = $.connection.timerHub;
-        var admin = '@admin';
-        var id = '@id';
 
+        
+        var admin = 'admin';
+        var id = 'id';
+        
         function init() {
             if (admin == id) {
                 time = player.getDuration();
