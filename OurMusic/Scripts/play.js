@@ -33,6 +33,7 @@ $(function () {
     }
 
     prox.client.change = function (video) {
+        document.getElementById("queueList").deleteRow(1);
         player.loadVideoById(video);
         setTimeout(getTime, 2000);
     }

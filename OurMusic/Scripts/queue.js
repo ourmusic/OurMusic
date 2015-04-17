@@ -101,6 +101,7 @@ $(function () {
     });
 
 
+
     $(document.body).on('click', 'button.downvote', function () {
 
         var row = this.parentNode.parentNode;
@@ -170,6 +171,11 @@ $(function () {
     });
 
 });
+
+function deleteRow(r) {
+    var i = r.parentNode.parentNode.rowIndex;
+    document.getElementById("myTable").deleteRow(i);
+}
 
 function addRow(title, url, votes) {
     var table = document.getElementById('queueList');
