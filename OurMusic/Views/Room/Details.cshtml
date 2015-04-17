@@ -6,13 +6,18 @@
         
     String admin = ViewBag.Room.administrator.ToString();
     String id = ViewBag.Person.userID.ToString();
-        
+    String roomID = ViewBag.Room.roomid.ToString();
 }
 <head>
+    <title>Room</title>
     <!-- For testing-->
     <link href="~/Content/qunit-1.18.0.css" rel="stylesheet" />
 </head>
-
+<p>
+    Current user is @id <br/>
+    Room admin is @admin <br/>
+    Room id is @roomID
+</p>
 <div class="row">
     <h1>@Model.name</h1>
     <div class="col-lg-4">

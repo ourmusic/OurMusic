@@ -6,6 +6,7 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using OurMusic.Models;
 using System.Timers;
+using System.Threading.Tasks;
 
 namespace OurMusic.Hubs
 {
@@ -16,14 +17,17 @@ namespace OurMusic.Hubs
 
         private static VideoQueue videoQueue = new VideoQueue(true);
 
+        /// <summary>
+        /// Room admin starts the counter.
+        /// Also adds the ElapsedEventHandler
+        /// </summary>
+        /// <param name="seconds">Number of seconds for the first video</param>
         public void StartInitCountDown(int seconds)
         {
             _timer.Interval = (seconds + 2) * 1000;
             _timer.Elapsed += new ElapsedEventHandler(_timer_Done);
             _timer.Start();
         }
-
-
 
         /// <summary>
         /// Starts the countdown timer for the video to finish.
@@ -88,6 +92,35 @@ namespace OurMusic.Hubs
             Clients.Caller.refreshList(jsonOfQueue);
 
         }
+
+
+
+
+
+
+
+
+        //Room group methods
+        public override Task OnConnected()
+        {
+
+            return base.OnConnected();
+        }
+
+
+        public Task AddToRoom(string roomName)
+        {
+
+            return Groups.Add(Context.ConnectionId, roomName);
+        }
+
+        public Task RemoveFromRoom(string roomName)
+        {
+
+            return Groups.Remove(Context.ConnectionId, roomName);
+        }
+
+
 
     }
 
