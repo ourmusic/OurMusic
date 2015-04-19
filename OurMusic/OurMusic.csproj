@@ -189,6 +189,7 @@
     </Compile>
     <Compile Include="Hubs\TimerHub.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\PublicRoom.cs" />
     <Compile Include="Models\Video.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\OurMusic.Context.cs">

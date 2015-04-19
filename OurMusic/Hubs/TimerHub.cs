@@ -99,16 +99,53 @@ namespace OurMusic.Hubs
 
 
 
+        //NEW MOTHODS FOR ROOMS
+        public void Init(String guid)
+        {
+            //Need to check if this guid had already been used
+            //This part relies on how you implement the data structure, Jake.
+            PublicRoom pub = new PublicRoom(guid);
+            //Add pub to data structure
+        }
+
+        public void CountDown(String guid, int seconds)
+        {
+            //Find room with guid
+            //pub.CountDown(seconds);
+        }
+
+        public void AddToQueue(String guid, string vidTitle, string vidUrl)
+        {
+            //Find room 
+            //pub.AddToQueue(new Video(vidTitle, vidUrl));
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
         //Room group methods
-
-        public override Task OnConnected(string userID)
+        /*public override Task OnConnected()
         {
-            
             return base.OnConnected();
         }
 
@@ -124,9 +161,10 @@ namespace OurMusic.Hubs
 
             return Groups.Remove(Context.ConnectionId, roomName);
         }
-
-
-
+        */
     }
+
+
+
 
 }
