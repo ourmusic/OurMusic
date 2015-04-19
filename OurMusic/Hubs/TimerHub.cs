@@ -7,14 +7,18 @@ using Microsoft.AspNet.SignalR.Hubs;
 using OurMusic.Models;
 using System.Timers;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace OurMusic.Hubs
 {
     //[HubName("timerHub")]
     public class TimerHub : Hub
     {
+        private OurMusicEntities db = new OurMusicEntities();
+        public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+        
         private static Timer _timer = new Timer();
-
         private static VideoQueue videoQueue = new VideoQueue(true);
 
         /// <summary>
@@ -101,9 +105,10 @@ namespace OurMusic.Hubs
 
 
         //Room group methods
-        public override Task OnConnected()
-        {
 
+        public override Task OnConnected(string userID)
+        {
+            
             return base.OnConnected();
         }
 
