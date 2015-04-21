@@ -19,7 +19,7 @@
     Room id is @roomID
 </p>
 <div class="row">
-    <h1>@Model.name</h1>
+    <h1 id="roomName">@Model.name</h1>
     <div class="col-lg-4">
         <h3>People</h3>
         <ul class="list-group">
@@ -109,11 +109,12 @@
         
         var admin = '@admin';
         var id = '@id';
+        var guid = '@Model.name';
         
         function init() {
             if (admin == id) {
                 time = player.getDuration();
-                prox.server.startInitCountDown(time);
+                prox.server.startInitCountDown(time, guid);
             } else {
                 player.playVideo();
             }
@@ -129,7 +130,7 @@
 
         function getTime() {
             time = player.getDuration();
-            prox.server.startCountDown(time);
+            prox.server.countDown(time, guid);
         }
 
         $.connection.hub.start().done(init);

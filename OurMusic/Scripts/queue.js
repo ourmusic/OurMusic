@@ -6,11 +6,16 @@ $(function () {
     var tHub = $.connection.timerHub;
 
     //Now all arrays can call swapItems to swap objects at two indices
-    Array.prototype.swapItems = function (a, b) {
+    /*Array.prototype.swapItems = function (a, b) {
         var temp = this[a];
         this[a] = this[b];
         this[b] = temp;
     };
+    */
+    var roomName = document.getElementById("roomName").innerHTML;
+
+
+
 
     tHub.client.refreshList = function (jsonString) {
 
@@ -57,6 +62,7 @@ $(function () {
 
     $(document.body).on('click', 'button.upvote', function () {
 
+        //alert("roomName = " + roomName);
         var row = this.parentNode.parentNode;
 
         var votesCell = row.cells[2];
@@ -70,20 +76,21 @@ $(function () {
         var upGlyphSpan = spansArray[0];
         var downGlyphSpan = spansArray[1];
 
+
         if (row.value == "neutral") {
             row.value = "up";
             //votesCell.innerHTML = oldVotes + 1;
 
             $(upGlyphSpan).css("color", "#FF9933");
             // alert("neutral to up!  rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1, roomName);
         }
         else if (row.value == "up") {
             row.value = "neutral";
             //votesCell.innerHTML = oldVotes - 1;
             $(upGlyphSpan).css("color", "#FFFFFF");
             // alert("up to neutral! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1, roomName);
         }
         else {
             //currently downvoted
@@ -92,7 +99,7 @@ $(function () {
             $(upGlyphSpan).css("color", "#FF9933");
             $(downGlyphSpan).css("color", "#FFFFFF");
             // alert("down to up! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 2);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 2, roomName);
         }
 
 
@@ -122,14 +129,14 @@ $(function () {
             //votesCell.innerHTML = oldVotes - 1;
             $(downGlyphSpan).css("color", "#33CCFF");
             // alert("neutral to down!  rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1, roomName);
         }
         else if (row.value == "down") {
             row.value = "neutral";
             //votesCell.innerHTML = oldVotes + 1;
             $(downGlyphSpan).css("color", "#FFFFFF");
             //alert("down to neutral! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1, roomName);
         }
         else {
             //currently upvoted
@@ -138,7 +145,7 @@ $(function () {
             $(upGlyphSpan).css("color", "#FFFFFF");
             $(downGlyphSpan).css("color", "#33CCFF");
             //alert("up to down! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -2);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -2, roomName);
         }
 
 
@@ -152,11 +159,13 @@ $(function () {
 
     // Start the connection.
     $.connection.hub.start().done(function () {
-        tHub.server.refreshClientQueue();
+
+        var rName = document.getElementById("roomName").innerHTML;
+        tHub.server.refreshClient(rName);
 
         $('#addVideo').click(function () {
             // Call the Send method on the hub.
-            tHub.server.addToQueue($('#vidTitle').val(), $('#vidUrl').val());
+            tHub.server.addToQueue($('#vidTitle').val(), $('#vidUrl').val(), roomName);
             // Clear text box and reset focus for next comment.
             $('#vidUrl').val('');
             $('#vidTitle').val('').focus();
