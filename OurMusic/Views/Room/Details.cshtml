@@ -18,6 +18,7 @@
     Room admin is @admin <br/>
     Room id is @roomID
 </p>
+@Html.ActionLink("DELETE ROOM", "Delete", "Room", new { id = ViewBag.Room.roomid }, new { })
 <div class="row">
     <h1 id="roomName">@Model.name</h1>
     <div class="col-lg-4">
