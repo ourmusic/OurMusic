@@ -114,6 +114,12 @@ namespace OurMusic.Hubs
             
         }
 
+        public void deleteVideo(string videoTitle, string videoURL, string roomName)
+        {
+            rooms[roomName].deleteVideo(videoTitle, videoURL);
+            Clients.Group(roomName).deleteVideo(videoURL);
+        }
+
 
         /**
          * This implements the generic JoinRoom function

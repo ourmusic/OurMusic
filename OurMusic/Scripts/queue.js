@@ -1,20 +1,50 @@
 ﻿
+var roomName;
+var refreshListTest = function (jsonString) {
+
+    //parse json representation of queue into JavaScript Array of Video objects
+    var parsedList = JSON.parse(jsonString);
+    var rowHTML = ""
+
+    $('#tbd tr').remove();
+
+    for (i = 0; i < parsedList.length; i++) {
+        addRow(parsedList[i].title, parsedList[i].url, parsedList[i].votes);
+
+    }
+
+};
 
 
+adjustVotesAndPlacementTest = function (videoUrl, votesChange, movement) {
+
+    if (movement == -999) return;
+
+    var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
+    //alert("movement = " + movement);
+    var votesCell = videoRow.cells[2];
+    var oldVotes = parseInt(votesCell.innerHTML);
+    votesCell.innerHTML = oldVotes + votesChange;
+    //var toMove = movement;
+
+    while (movement > 0) {
+        //move up
+        //alert("moving up")
+        $(videoRow).prev().before(videoRow);
+        movement--;
+    }
+    while (movement < 0) {
+        $(videoRow).next().after(videoRow);
+        movement++;
+    }
+
+
+};
 $(function () {
 
     var tHub = $.connection.timerHub;
 
-    //Now all arrays can call swapItems to swap objects at two indices
-    /*Array.prototype.swapItems = function (a, b) {
-        var temp = this[a];
-        this[a] = this[b];
-        this[b] = temp;
-    };
-    */
-    var roomName = document.getElementById("roomName").innerHTML;
-
-
+    roomName = document.getElementById("roomName").innerHTML;
 
 
     tHub.client.refreshList = function (jsonString) {
@@ -30,9 +60,13 @@ $(function () {
 
         }
 
-
-
     };
+
+    tHub.client.deleteVideo = function (videoUrl) {
+        var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
+        $(videoRow).remove();
+    }
+
 
     tHub.client.adjustVotesAndPlacement = function (videoUrl, votesChange, movement) {
 
@@ -60,6 +94,18 @@ $(function () {
     };
 
 
+    $(document.body).on('click', 'button.delete', function () {
+
+        //alert("roomName = " + roomName);
+        var row = this.parentNode.parentNode;
+
+        var rowIndex = row.rowIndex;
+        var videoTitle = row.cells[0].innerHTML;
+        var videoURL = row.cells[1].innerHTML;
+
+        tHub.server.deleteVideo(videoTitle, videoURL, roomName);
+
+    });
     $(document.body).on('click', 'button.upvote', function () {
 
         //alert("roomName = " + roomName);
@@ -207,6 +253,8 @@ function addRow(title, url, votes) {
     upButton.type = "button";
     upButton.className = "btn btn-default btn-sm move upvote";
 
+   
+
     var upBtnSpan = document.createElement("span");
     upBtnSpan.className = "glyphicon glyphicon-arrow-up";
 
@@ -226,4 +274,20 @@ function addRow(title, url, votes) {
     downButton.appendChild(downBtnSpan);
     cell5.appendChild(downButton);
 
+    if(document.getElementById("isAdmin").value == "admin") {
+        var cell6 = row.insertCell(5);
+        var delButton = document.createElement("button");
+        delButton.id = url;
+        delButton.type = "button";
+        delButton.className = "btn btn-default btn-sm delete red";
+
+   
+
+        var delSpan = document.createElement("span");
+        delSpan.className = "glyphicon glyphicon-remove red";
+        delSpan.color = "#FF0000";
+        
+        delButton.appendChild(delSpan);
+        cell6.appendChild(delButton);
+    }
 };

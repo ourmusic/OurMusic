@@ -19,6 +19,7 @@
     Room admin is @admin <br/>
     Room id is @roomID
 </p>
+
 @Html.ActionLink("DELETE ROOM", "Delete", "Room", new { id = ViewBag.Room.roomid }, new { })
 <div class="row">
     <h1 id="roomName">@Model.name</h1>
@@ -55,6 +56,14 @@
 
 
 
+@if (@admin == @id)
+{
+    <input type="hidden" id="isAdmin" value="admin" />
+}
+else
+{
+    <input type="hidden" id="isAdmin" value="no" />
+}
 <div id="player"></div>
 <div>
     <input type="text" id="searchQuery" placeholder="Enter Search Query Here" size="35"/>
@@ -64,13 +73,17 @@
     <input type="text" id="vidUrl" placeholder ="Video URL" size="35" disabled/>
     <input type="button" id="addVideo" value="Add To Queue" disabled/><br />
     <table id="queueList" class="table">
-        <thead>
-            <tr>
+        <thead id="tableHeader">
+            <tr id="titleRow">
                 <th>Video Title</th>
                 <th>Video URL</th>
                 <th>Votes</th>
                 <th>Upvote</th>
                 <th>Downvote</th>
+                @if (@admin == @id)
+                {
+                    <th>Delete</th>
+                }
             </tr>
         </thead>
         <tbody id="tbd"></tbody>
@@ -206,8 +219,11 @@
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
 <script src="~/Scripts/qunit-1.18.0.js"></script>
-<script src="~/Scripts/searchtest.js"></script>
-    -->
+<!-- <script src="~/Scripts/searchtest.js"></script>
+
+<script src="~/Scripts/queueTests.js"</script>
+-->
+
 
 <h2>Room Chat</h2>
 <div class="container">

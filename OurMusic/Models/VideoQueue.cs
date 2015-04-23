@@ -98,6 +98,11 @@ namespace OurMusic.Models
             return checkOrder(vid);
         }
 
+        public void delete(string vidTitle, string vidUrl){
+            LinkedListNode<Video> vid = findByTitleAndUrl(vidTitle, vidUrl);
+            if(vid != null) videoList.Remove(vid);
+        }
+
 
         /*
          * called in vote.  After a video's vote score is adjusted, checkOrder runs to see if that video needs to move in the queue to maintain sorted scores.

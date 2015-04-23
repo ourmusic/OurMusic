@@ -83,6 +83,11 @@ namespace OurMusic.Models
 
         }
 
+        public void deleteVideo(string videoTitle, string videoUrl)
+        {
+            _queue.delete(videoTitle, videoUrl);
+        }
+
 
 
 
