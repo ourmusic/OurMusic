@@ -1,16 +1,51 @@
 ﻿
+var roomName;
+var refreshListTest = function (jsonString) {
+
+    //parse json representation of queue into JavaScript Array of Video objects
+    var parsedList = JSON.parse(jsonString);
+    var rowHTML = ""
+
+    $('#tbd tr').remove();
+
+    for (i = 0; i < parsedList.length; i++) {
+        addRow(parsedList[i].title, parsedList[i].url, parsedList[i].votes);
+
+    }
+
+};
 
 
+adjustVotesAndPlacementTest = function (videoUrl, votesChange, movement) {
+
+    if (movement == -999) return;
+
+    var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
+    //alert("movement = " + movement);
+    var votesCell = videoRow.cells[2];
+    var oldVotes = parseInt(votesCell.innerHTML);
+    votesCell.innerHTML = oldVotes + votesChange;
+    //var toMove = movement;
+
+    while (movement > 0) {
+        //move up
+        //alert("moving up")
+        $(videoRow).prev().before(videoRow);
+        movement--;
+    }
+    while (movement < 0) {
+        $(videoRow).next().after(videoRow);
+        movement++;
+    }
+
+
+};
 $(function () {
 
     var tHub = $.connection.timerHub;
 
-    //Now all arrays can call swapItems to swap objects at two indices
-    Array.prototype.swapItems = function (a, b) {
-        var temp = this[a];
-        this[a] = this[b];
-        this[b] = temp;
-    };
+    roomName = document.getElementById("roomName").innerHTML;
+
 
     tHub.client.refreshList = function (jsonString) {
 
@@ -25,9 +60,13 @@ $(function () {
 
         }
 
-
-
     };
+
+    tHub.client.deleteVideo = function (videoUrl) {
+        var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
+        $(videoRow).remove();
+    }
+
 
     tHub.client.adjustVotesAndPlacement = function (videoUrl, votesChange, movement) {
 
@@ -55,8 +94,21 @@ $(function () {
     };
 
 
+    $(document.body).on('click', 'button.delete', function () {
+
+        //alert("roomName = " + roomName);
+        var row = this.parentNode.parentNode;
+
+        var rowIndex = row.rowIndex;
+        var videoTitle = row.cells[0].innerHTML;
+        var videoURL = row.cells[1].innerHTML;
+
+        tHub.server.deleteVideo(videoTitle, videoURL, roomName);
+
+    });
     $(document.body).on('click', 'button.upvote', function () {
 
+        //alert("roomName = " + roomName);
         var row = this.parentNode.parentNode;
 
         var votesCell = row.cells[2];
@@ -70,20 +122,21 @@ $(function () {
         var upGlyphSpan = spansArray[0];
         var downGlyphSpan = spansArray[1];
 
+
         if (row.value == "neutral") {
             row.value = "up";
             //votesCell.innerHTML = oldVotes + 1;
 
             $(upGlyphSpan).css("color", "#FF9933");
             // alert("neutral to up!  rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1, roomName);
         }
         else if (row.value == "up") {
             row.value = "neutral";
             //votesCell.innerHTML = oldVotes - 1;
             $(upGlyphSpan).css("color", "#FFFFFF");
             // alert("up to neutral! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1, roomName);
         }
         else {
             //currently downvoted
@@ -92,7 +145,7 @@ $(function () {
             $(upGlyphSpan).css("color", "#FF9933");
             $(downGlyphSpan).css("color", "#FFFFFF");
             // alert("down to up! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 2);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 2, roomName);
         }
 
 
@@ -122,14 +175,14 @@ $(function () {
             //votesCell.innerHTML = oldVotes - 1;
             $(downGlyphSpan).css("color", "#33CCFF");
             // alert("neutral to down!  rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1, roomName);
         }
         else if (row.value == "down") {
             row.value = "neutral";
             //votesCell.innerHTML = oldVotes + 1;
             $(downGlyphSpan).css("color", "#FFFFFF");
             //alert("down to neutral! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1, roomName);
         }
         else {
             //currently upvoted
@@ -138,7 +191,7 @@ $(function () {
             $(upGlyphSpan).css("color", "#FFFFFF");
             $(downGlyphSpan).css("color", "#33CCFF");
             //alert("up to down! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
-            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -2);
+            tHub.server.voteByTitleAndUrl(videoTitle, videoURL, -2, roomName);
         }
 
 
@@ -152,11 +205,13 @@ $(function () {
 
     // Start the connection.
     $.connection.hub.start().done(function () {
-        tHub.server.refreshClientQueue();
+
+        var rName = document.getElementById("roomName").innerHTML;
+        tHub.server.refreshClient(rName);
 
         $('#addVideo').click(function () {
             // Call the Send method on the hub.
-            tHub.server.addToQueue($('#vidTitle').val(), $('#vidUrl').val());
+            tHub.server.addToQueue($('#vidTitle').val(), $('#vidUrl').val(), roomName);
             // Clear text box and reset focus for next comment.
             $('#vidUrl').val('');
             $('#vidTitle').val('').focus();
@@ -198,6 +253,8 @@ function addRow(title, url, votes) {
     upButton.type = "button";
     upButton.className = "btn btn-default btn-sm move upvote";
 
+   
+
     var upBtnSpan = document.createElement("span");
     upBtnSpan.className = "glyphicon glyphicon-arrow-up";
 
@@ -217,4 +274,20 @@ function addRow(title, url, votes) {
     downButton.appendChild(downBtnSpan);
     cell5.appendChild(downButton);
 
+    if(document.getElementById("isAdmin").value == "admin") {
+        var cell6 = row.insertCell(5);
+        var delButton = document.createElement("button");
+        delButton.id = url;
+        delButton.type = "button";
+        delButton.className = "btn btn-default btn-sm delete red";
+
+   
+
+        var delSpan = document.createElement("span");
+        delSpan.className = "glyphicon glyphicon-remove red";
+        delSpan.color = "#FF0000";
+        
+        delButton.appendChild(delSpan);
+        cell6.appendChild(delButton);
+    }
 };

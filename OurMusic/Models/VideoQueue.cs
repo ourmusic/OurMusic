@@ -35,7 +35,6 @@ namespace OurMusic.Models
         }
 
 
-
         public Video removeFirstVideo()
         {
             Video ret = videoList.First();
@@ -96,6 +95,11 @@ namespace OurMusic.Models
             if (vid == null) return VIDEONOTFOUND;
             vid.Value.vote(voteChange);
             return checkOrder(vid);
+        }
+
+        public void delete(string vidTitle, string vidUrl){
+            LinkedListNode<Video> vid = findByTitleAndUrl(vidTitle, vidUrl);
+            if(vid != null) videoList.Remove(vid);
         }
 
 

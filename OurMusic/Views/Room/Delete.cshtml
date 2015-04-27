@@ -20,7 +20,7 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.name)
+            room @Html.DisplayNameFor(model => model.name)
         </dt>
 
         <dd>
@@ -28,21 +28,12 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Person.firstName)
+            admin @Html.DisplayNameFor(model => model.Person.firstName)
         </dt>
 
         <dd>
             @Html.DisplayFor(model => model.Person.firstName)
         </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Room2.name)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Room2.name)
-        </dd>
-
     </dl>
 
     @using (Html.BeginForm()) {

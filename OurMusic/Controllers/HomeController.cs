@@ -29,6 +29,10 @@ namespace OurMusic.Controllers
             var person = db.People.Where(x => x.userName == user.UserName).FirstOrDefault();
             return person;
         }
+        public ActionResult Chat()
+        {
+            return View();
+        }
     
     }
 }

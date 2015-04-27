@@ -7,6 +7,7 @@
     String admin = ViewBag.Room.administrator.ToString();
     String id = ViewBag.Person.userID.ToString();
     String roomID = ViewBag.Room.roomid.ToString();
+    String username = ViewBag.Person.userName.ToString();
 }
 <head>
     <title>Room</title>
@@ -18,8 +19,10 @@
     Room admin is @admin <br/>
     Room id is @roomID
 </p>
+
+@Html.ActionLink("DELETE ROOM", "Delete", "Room", new { id = ViewBag.Room.roomid }, new { })
 <div class="row">
-    <h1>@Model.name</h1>
+    <h1 id="roomName">@Model.name</h1>
     <div class="col-lg-4">
         <h3>People</h3>
         <ul class="list-group">
@@ -53,6 +56,14 @@
 
 
 
+@if (@admin == @id)
+{
+    <input type="hidden" id="isAdmin" value="admin" />
+}
+else
+{
+    <input type="hidden" id="isAdmin" value="no" />
+}
 <div id="player"></div>
 <div>
     <input type="text" id="searchQuery" placeholder="Enter Search Query Here" size="35"/>
@@ -62,13 +73,17 @@
     <input type="text" id="vidUrl" placeholder ="Video URL" size="35" disabled/>
     <input type="button" id="addVideo" value="Add To Queue" disabled/><br />
     <table id="queueList" class="table">
-        <thead>
-            <tr>
+        <thead id="tableHeader">
+            <tr id="titleRow">
                 <th>Video Title</th>
                 <th>Video URL</th>
                 <th>Votes</th>
                 <th>Upvote</th>
                 <th>Downvote</th>
+                @if (@admin == @id)
+                {
+                    <th>Delete</th>
+                }
             </tr>
         </thead>
         <tbody id="tbd"></tbody>
@@ -109,11 +124,12 @@
         
         var admin = '@admin';
         var id = '@id';
+        var guid = '@Model.name';
         
         function init() {
             if (admin == id) {
                 time = player.getDuration();
-                prox.server.startInitCountDown(time);
+                prox.server.startInitCountDown(time, guid);
             } else {
                 player.playVideo();
             }
@@ -129,7 +145,7 @@
 
         function getTime() {
             time = player.getDuration();
-            prox.server.startCountDown(time);
+            prox.server.countDown(time, guid);
         }
 
         $.connection.hub.start().done(init);
@@ -203,6 +219,38 @@
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
 <script src="~/Scripts/qunit-1.18.0.js"></script>
-<script src="~/Scripts/searchtest.js"></script>
-    -->
+<!-- <script src="~/Scripts/searchtest.js"></script>
 
+<script src="~/Scripts/queueTests.js"</script>
+-->
+
+
+<h2>Room Chat</h2>
+<div class="container">
+    <input type="text" id="message" />
+    <input type="button" id="sendmessage" value="Send" />
+    <input type="hidden" id="displayname" />
+    <ul id="discussion"></ul>
+</div>
+<script>
+    $(function () {
+        //var chat = $.connection.chatHub;
+        var tHub = $.connection.timerHub;
+        var roomName = 
+        tHub.client.addNewMessageToPage = function (name, message) {
+            $('#discussion').append('<li><strong>' + htmlEncode(name)
+                + '</strong>: ' + htmlEncode(message) + '</li>');
+        };
+        $('#message').focus();
+        $.connection.hub.start().done(function () {
+            $('#sendmessage').click(function () {
+                tHub.server.send('@username', $('#message').val(), document.getElementById("roomName").innerHTML);
+                $('#message').val('').focus();
+            });
+        });
+    });
+    function htmlEncode(value) {
+        var encodedValue = $('<div />').text(value).html();
+        return encodedValue;
+    }
+</script>
