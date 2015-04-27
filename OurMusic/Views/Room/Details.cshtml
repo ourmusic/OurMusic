@@ -234,15 +234,17 @@ else
 </div>
 <script>
     $(function () {
-        var chat = $.connection.chatHub;
-        chat.client.addNewMessageToPage = function (name, message) {
+        //var chat = $.connection.chatHub;
+        var tHub = $.connection.timerHub;
+        var roomName = 
+        tHub.client.addNewMessageToPage = function (name, message) {
             $('#discussion').append('<li><strong>' + htmlEncode(name)
                 + '</strong>: ' + htmlEncode(message) + '</li>');
         };
         $('#message').focus();
         $.connection.hub.start().done(function () {
             $('#sendmessage').click(function () {
-                chat.server.send('@username', $('#message').val());
+                tHub.server.send('@username', $('#message').val(), document.getElementById("roomName").innerHTML);
                 $('#message').val('').focus();
             });
         });

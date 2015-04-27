@@ -120,6 +120,15 @@ namespace OurMusic.Hubs
             Clients.Group(roomName).deleteVideo(videoURL);
         }
 
+        public void Hello()
+        {
+            Clients.All.hello();
+        }
+        public void Send(String name, String message, string roomName)
+        {
+            Clients.Group(roomName).addNewMessageToPage(name, message);
+        }
+
 
         /**
          * This implements the generic JoinRoom function

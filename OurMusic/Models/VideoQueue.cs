@@ -35,7 +35,6 @@ namespace OurMusic.Models
         }
 
 
-
         public Video removeFirstVideo()
         {
             Video ret = videoList.First();
