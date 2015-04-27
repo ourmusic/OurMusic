@@ -20,6 +20,7 @@ namespace OurMusic.Models
         public PublicRoom(String guid)
         {
             _roomID = guid;
+            _queue = new VideoQueue(true);
             _timer.Elapsed += new ElapsedEventHandler(_timer_Done);
         }
 
