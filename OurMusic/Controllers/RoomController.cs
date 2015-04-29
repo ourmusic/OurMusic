@@ -10,6 +10,9 @@ using System.Web.Mvc;
 using OurMusic.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
+using OurMusic.Hubs;
 
 namespace OurMusic.Controllers
 {
@@ -18,6 +21,7 @@ namespace OurMusic.Controllers
         private OurMusicEntities db = new OurMusicEntities();
         public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
         private string LOGGEDIN_USER;
+        private IHubContext _context = GlobalHost.ConnectionManager.GetHubContext<TimerHub>();
         // GET: /Room/
         public async Task<ActionResult> Index()
         {
@@ -133,6 +137,14 @@ namespace OurMusic.Controllers
         public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
             Room room = await db.Rooms.FindAsync(id);
+
+
+            var users = db.People.Where(x => x.activeRoom == room.roomid);
+            foreach (var user in users)
+                user.activeRoom = null;
+
+            await db.SaveChangesAsync();
+
             db.Rooms.Remove(room);
             await db.SaveChangesAsync();
             return RedirectToAction("Index");
