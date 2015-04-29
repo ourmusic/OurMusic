@@ -17,7 +17,7 @@ namespace OurMusic.Hubs
     {
         private OurMusicEntities db = new OurMusicEntities();
         public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-        
+
         //private static Timer _timer = new Timer();
         //private static VideoQueue videoQueue = new VideoQueue(true);
 
@@ -47,50 +47,7 @@ namespace OurMusic.Hubs
             }
         }
 
-        /// <summary>
-        /// Starts the countdown timer for the video to finish.
-        /// Used by the play.js file which handles the client-server communication functions
-        /// </summary>
-        /// <param name="seconds">Video duration</param>
-        /**
-        public void StartCountDown(int seconds)
-        {
-            _timer.Interval = (seconds + 2) * 1000;
-            _timer.Start();
-        }
-        **/
 
-        /**
-        /// <summary>
-        /// Event handler for when the timer is done
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
-        private void _timer_Done(Object source, ElapsedEventArgs e)
-        {
-            _timer.Stop();
-            String video = GetNextVideo();
-            Clients.All.change(video);
-
-        }
-
-        /// <summary>
-        /// This method is incomplete and needs to be work on by Jake and Fidel
-        /// It will pull the next video from the queue and add play it.
-        /// 
-        /// This function gets used by the Timer event handler.
-        /// </summary>
-        /// <returns>The next video ID in the queue</returns>
-        public String GetNextVideo()
-        {
-            if (videoQueue.getLength() == 0)
-            {
-                return "Xpe-JoGyPsY";
-            }
-            Video toPlay = videoQueue.removeFirstVideo();
-            return toPlay.getUrl();
-        }
-        **/
 
 
         public void addToQueue(string vidTitle, string vidUrl, string roomName)
@@ -99,6 +56,8 @@ namespace OurMusic.Hubs
             rooms[roomName].AddToQueue(vidTitle, vidUrl);
             //PublicRoom.AddToQueue() tells clients about new video
         }
+
+
 
         /**
          * called by a client, must specify roomName of existing room.
@@ -111,13 +70,34 @@ namespace OurMusic.Hubs
             int movement = rooms[roomName].voteAndUpdate(vidTitle, vidUrl, voteChange);
             System.Diagnostics.Debug.WriteLine("vote " + vidTitle + ", movement = " + movement);
             Clients.Group(roomName).adjustVotesAndPlacement(vidUrl, voteChange, movement);
-            
+
         }
 
         public void deleteVideo(string videoTitle, string videoURL, string roomName)
         {
             rooms[roomName].deleteVideo(videoTitle, videoURL);
             Clients.Group(roomName).deleteVideo(videoURL);
+        }
+
+        /**
+         * called by room administrator's javascript
+         * updates removed user from db, and notifies room that user was removed
+         * the removed user will have to make a separate call to remove himself from the group
+         **/
+        public void removeUser(Guid uID, string roomName)
+        {
+            var user = db.People.Find(uID);
+
+            user.activeRoom = null;
+
+            db.SaveChangesAsync();
+            Clients.Group(roomName).userRemoved(uID);
+        }
+
+        public Task leaveRoom(string roomName)
+        {
+
+            return Groups.Remove(Context.ConnectionId, roomName);
         }
 
         public void Hello()
@@ -141,10 +121,11 @@ namespace OurMusic.Hubs
             await Groups.Add(Context.ConnectionId, roomName);
             PublicRoom clientsRoom;
             string jsonOfQueue;
-            if(rooms.TryGetValue(roomName, out clientsRoom)){
+            if (rooms.TryGetValue(roomName, out clientsRoom))
+            {
                 clientsRoom.updateContext();
                 jsonOfQueue = clientsRoom.jsonRoomsQueue();
-                
+
             }
             else
             {
@@ -154,7 +135,7 @@ namespace OurMusic.Hubs
             Clients.Caller.refreshList(jsonOfQueue);
 
 
-            
+
         }
 
 
@@ -172,7 +153,7 @@ namespace OurMusic.Hubs
                 System.Diagnostics.Debug.WriteLine("Value added for key = " + guid);
             }
 
-            
+
         }
 
         public void CountDown(int seconds, String guid)
@@ -183,52 +164,5 @@ namespace OurMusic.Hubs
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //Room group methods
-        /*public override Task OnConnected()
-        {
-            return base.OnConnected();
-        }
-
-
-        public Task AddToRoom(string roomName)
-        {
-
-            return Groups.Add(Context.ConnectionId, roomName);
-        }
-
-        public Task RemoveFromRoom(string roomName)
-        {
-
-            return Groups.Remove(Context.ConnectionId, roomName);
-        }
-        */
     }
-
-
-
-
 }

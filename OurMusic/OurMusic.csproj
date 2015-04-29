@@ -277,6 +277,7 @@
     <Content Include="Scripts\queue.js" />
     <Content Include="Scripts\queueTests.js" />
     <Content Include="Scripts\qunit-1.18.0.js" />
+    <Content Include="Scripts\removeUser.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />

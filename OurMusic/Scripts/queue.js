@@ -1,65 +1,25 @@
 ﻿
+//global which is set to the room name using javascript DOM.  sent as parameter to server functions
 var roomName;
-var refreshListTest = function (jsonString) {
-
-    //parse json representation of queue into JavaScript Array of Video objects
-    var parsedList = JSON.parse(jsonString);
-    var rowHTML = ""
-
-    $('#tbd tr').remove();
-
-    for (i = 0; i < parsedList.length; i++) {
-        addRow(parsedList[i].title, parsedList[i].url, parsedList[i].votes);
-
-    }
-
-};
 
 
-adjustVotesAndPlacementTest = function (videoUrl, votesChange, movement) {
-
-    if (movement == -999) return;
-
-    var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
-    //alert("movement = " + movement);
-    var votesCell = videoRow.cells[2];
-    var oldVotes = parseInt(votesCell.innerHTML);
-    votesCell.innerHTML = oldVotes + votesChange;
-    //var toMove = movement;
-
-    while (movement > 0) {
-        //move up
-        //alert("moving up")
-        $(videoRow).prev().before(videoRow);
-        movement--;
-    }
-    while (movement < 0) {
-        $(videoRow).next().after(videoRow);
-        movement++;
-    }
-
-
-};
 $(function () {
 
     var tHub = $.connection.timerHub;
 
     roomName = document.getElementById("roomName").innerHTML;
 
-
     tHub.client.refreshList = function (jsonString) {
 
         //parse json representation of queue into JavaScript Array of Video objects
         var parsedList = JSON.parse(jsonString);
-        var rowHTML = ""
+        var rowHTML = "";
 
         $('#tbd tr').remove();
 
         for (i = 0; i < parsedList.length; i++) {
             addRow(parsedList[i].title, parsedList[i].url, parsedList[i].votes);
-
         }
-
     };
 
     tHub.client.deleteVideo = function (videoUrl) {
@@ -106,6 +66,7 @@ $(function () {
         tHub.server.deleteVideo(videoTitle, videoURL, roomName);
 
     });
+
     $(document.body).on('click', 'button.upvote', function () {
 
         //alert("roomName = " + roomName);
@@ -217,12 +178,6 @@ $(function () {
             $('#vidTitle').val('').focus();
         });
 
-
-
-
-
-
-
     });
 
 });
@@ -253,7 +208,7 @@ function addRow(title, url, votes) {
     upButton.type = "button";
     upButton.className = "btn btn-default btn-sm move upvote";
 
-   
+
 
     var upBtnSpan = document.createElement("span");
     upBtnSpan.className = "glyphicon glyphicon-arrow-up";
@@ -285,9 +240,54 @@ function addRow(title, url, votes) {
 
         var delSpan = document.createElement("span");
         delSpan.className = "glyphicon glyphicon-remove red";
-        delSpan.color = "#FF0000";
+        $(delSpan).css("color", "#FF0000");
         
         delButton.appendChild(delSpan);
         cell6.appendChild(delButton);
     }
 };
+
+//WAS used for Qunit testing.  Prefer manual testing
+/*
+var refreshListTest = function (jsonString) {
+
+    //parse json representation of queue into JavaScript Array of Video objects
+    var parsedList = JSON.parse(jsonString);
+    var rowHTML = ""
+
+    $('#tbd tr').remove();
+
+    for (i = 0; i < parsedList.length; i++) {
+        addRow(parsedList[i].title, parsedList[i].url, parsedList[i].votes);
+
+    }
+
+};
+
+
+//Was used for Qunit testing.
+adjustVotesAndPlacementTest = function (videoUrl, votesChange, movement) {
+
+    if (movement == -999) return;
+
+    var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
+    //alert("movement = " + movement);
+    var votesCell = videoRow.cells[2];
+    var oldVotes = parseInt(votesCell.innerHTML);
+    votesCell.innerHTML = oldVotes + votesChange;
+    //var toMove = movement;
+
+    while (movement > 0) {
+        //move up
+        //alert("moving up")
+        $(videoRow).prev().before(videoRow);
+        movement--;
+    }
+    while (movement < 0) {
+        $(videoRow).next().after(videoRow);
+        movement++;
+    }
+
+
+};
+*/

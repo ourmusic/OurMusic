@@ -11,7 +11,7 @@
     assert.ok(document.getElementById("queueList").rows.length == 4, "Passed!");
 });
 /*
-QUnit.test("short search", function (assert) {
+QUnit.test("voting", function (assert) {
 
 
     var testJSON = "[{\"$id\":\"1\",\"title\":\"Video One\",\"url\":\"Url One\",\"votes\":1},{\"$id\":\"2\",\"title\":\"Video Two\",\"url\":\"Url Two\",\"votes\":1},{\"$id\":\"3\",\"title\":\"Video Three\",\"url\":\"Url Three\",\"votes\":1}]";
@@ -47,7 +47,7 @@ QUnit.test("short search", function (assert) {
 
 });
 */
-QUnit.test("refreshList", function (assert) {
+QUnit.test("votes and placement", function (assert) {
     var testJSON = "[{\"$id\":\"1\",\"title\":\"Video One\",\"url\":\"Url One\",\"votes\":1},{\"$id\":\"2\",\"title\":\"Video Two\",\"url\":\"Url Two\",\"votes\":1},{\"$id\":\"3\",\"title\":\"Video Three\",\"url\":\"Url Three\",\"votes\":1}]";
     refreshListTest(testJSON);
 
