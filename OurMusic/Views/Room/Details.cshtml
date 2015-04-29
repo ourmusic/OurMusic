@@ -25,17 +25,21 @@
     <center><h1 id="roomName">@Model.name</h1></center>
     <div class="col-lg-4">
         <h3>People</h3>
-        <ul class="list-group">
-            @foreach(var x in Model.People)
-            { 
-            <li class="list-group-item">@x.firstName @x.lastName
-            @if(Model.administrator == x.userID)
-            {
-                <i>(Administrator)</i>
-            }
-             </li>
-            }
-        </ul>
+        <div class="panel panel-primary">
+               <div class="panel-body" style="max-height: 300px; overflow-y: scroll;">  
+                   <ul class="list-group">
+                        @foreach(var x in Model.People)
+                        { 
+                        <li class="list-group-item">@x.firstName @x.lastName
+                        @if(Model.administrator == x.userID)
+                        {
+                            <i>(Administrator)</i>
+                        }
+                         </li>
+                        }
+                    </ul>
+                </div>
+        </div>
     </div>
     <div class="col-lg-8">
         <div id="player"></div>
@@ -69,194 +73,195 @@ else
 <div>
     <div class="col-md-4"></div>
     <div class="col-md-4">
-        <input type="text" id="searchQuery" placeholder="Enter Search Query Here" size="35"/><br />
+        <input type="text" id="searchQuery" placeholder="Enter Search Query Here" size="35" /><br />
         <button id="searchButton" onclick="search()">Search Video</button>  <font color="red" id="searchError"></font><br />
         <br />
     </div>
     <div class="col-md-4">
-        <input type="text" id="vidTitle" placeholder="Video Title" size="35" disabled/><br />
-        <input type="text" id="vidUrl" placeholder ="Video URL" size="35" disabled/>
-        <input type="button" id="addVideo" value="Add To Queue" disabled/><br />
+        <input type="text" id="vidTitle" placeholder="Video Title" size="35" disabled /><br />
+        <input type="text" id="vidUrl" placeholder="Video URL" size="35" disabled />
+        <input type="button" id="addVideo" value="Add To Queue" disabled /><br />
     </div>
-    <table id="queueList" class="table">
-        <thead id="tableHeader">
-            <tr id="titleRow">
-                <th>Video Title</th>
-                <th>Video URL</th>
-                <th>Votes</th>
-                <th>Upvote</th>
-                <th>Downvote</th>
-                @if (@admin == @id)
-                {
-                    <th>Delete</th>
-                }
-            </tr>
-        </thead>
-        <tbody id="tbd"></tbody>
-    </table>
-</div>
+        <div class="panel-body" style="max-height: 300px; overflow-y: scroll;">
+            <table id="queueList" class="table">
+                <thead id="tableHeader">
+                    <tr id="titleRow">
+                        <th>Video Title</th>
+                        <th>Video URL</th>
+                        <th>Votes</th>
+                        <th>Upvote</th>
+                        <th>Downvote</th>
+                        @if (@admin == @id)
+                        {
+                            <th>Delete</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody id="tbd"></tbody>
+            </table>
+        </div>
 
-<script src="/Scripts/jquery-2.1.3.min.js"></script>
-<script src="/Scripts/jquery.signalR-2.2.0.js"></script>
-<script src="/signalr/hubs"></script>
+        <script src="/Scripts/jquery-2.1.3.min.js"></script>
+        <script src="/Scripts/jquery.signalR-2.2.0.js"></script>
+        <script src="/signalr/hubs"></script>
 
-<script type="text/javascript">
-    var tag = document.createElement('script');
+        <script type="text/javascript">
+            var tag = document.createElement('script');
 
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    var player;
-    var time;
+            var player;
+            var time;
 
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
-            height: '390',
-            width: '640',
-            videoId: 'zjQlCbshk1A',
-            events: {'onReady': onPlayerReady}
-        });
-    }
-
-    function onPlayerReady(event) {
-        event.target.playVideo(); // this is kept generic so the same callback can be used with any player object
-    }
-
-    //This is where the server-client code goes
-    $(function () {
-        var prox = $.connection.timerHub;
-
-        
-        var admin = '@admin';
-        var id = '@id';
-        var guid = '@Model.name';
-        
-        function init() {
-            if (admin == id) {
-                time = player.getDuration();
-                prox.server.startInitCountDown(time, guid);
-            } else {
-                player.playVideo();
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player('player', {
+                    height: '390',
+                    width: '640',
+                    videoId: 'zjQlCbshk1A',
+                    events: { 'onReady': onPlayerReady }
+                });
             }
-        }
 
-        prox.client.change = function (video) {
-            player.loadVideoById(video);
-            if (admin == id) {
-                setTimeout(getTime, 2000);
+            function onPlayerReady(event) {
+                event.target.playVideo(); // this is kept generic so the same callback can be used with any player object
             }
-            document.getElementById("queueList").deleteRow(1);
-        }
 
-        function getTime() {
-            time = player.getDuration();
-            prox.server.countDown(time, guid);
-        }
-
-        $.connection.hub.start().done(init);
-    });
-</script>
+            //This is where the server-client code goes
+            $(function () {
+                var prox = $.connection.timerHub;
 
 
-<script type="text/javascript">
-    function search() {
-        // Reset fields
-        document.getElementById("vidUrl").value = "";
-        document.getElementById("vidTitle").value = "";
-        document.getElementById("searchError").innerHTML = "";
-        document.getElementById("addVideo").disabled = true;
+                var admin = '@admin';
+                var id = '@id';
+                var guid = '@Model.name';
 
-        // Load the query into the url
-        var query = document.getElementById("searchQuery").value;
-        if (query.length < 3 || query.length > 33) {
-            document.getElementById("searchError").innerHTML = "Search queries must be 3-32 characters long!";
-            return;
-        }
-        var feedURL = "https://gdata.youtube.com/feeds/api/videos?q=" + query + "&max-results=1&output=embed/";
-
-        // Request youtube video result xml feed
-        var x = new XMLHttpRequest();
-        x.open("GET", feedURL, true);
-        x.send();
-        x.onreadystatechange = function () {
-            if (x.readyState == 4 && x.status == 200) {
-                var xml_doc = x.responseXML;
-
-                var entry_nodes = null;
-                var video_id = "undefined url/id";
-                var video_title = "undefined title";
-
-                // Iterate until the first <entry> to pull data from
-                for (i = 0; i < xml_doc.documentElement.childNodes.length; i++) {
-                    if (xml_doc.documentElement.childNodes[i].nodeName === "entry")
-                        entry_nodes = xml_doc.documentElement.childNodes[i].childNodes;
+                function init() {
+                    if (admin == id) {
+                        time = player.getDuration();
+                        prox.server.startInitCountDown(time, guid);
+                    } else {
+                        player.playVideo();
+                    }
                 }
-                
-                if (entry_nodes == null) {
-                    document.getElementById("searchError").innerHTML = "No search result found!";
+
+                prox.client.change = function (video) {
+                    player.loadVideoById(video);
+                    if (admin == id) {
+                        setTimeout(getTime, 2000);
+                    }
+                    document.getElementById("queueList").deleteRow(1);
+                }
+
+                function getTime() {
+                    time = player.getDuration();
+                    prox.server.countDown(time, guid);
+                }
+
+                $.connection.hub.start().done(init);
+            });
+        </script>
+
+
+        <script type="text/javascript">
+            function search() {
+                // Reset fields
+                document.getElementById("vidUrl").value = "";
+                document.getElementById("vidTitle").value = "";
+                document.getElementById("searchError").innerHTML = "";
+                document.getElementById("addVideo").disabled = true;
+
+                // Load the query into the url
+                var query = document.getElementById("searchQuery").value;
+                if (query.length < 3 || query.length > 33) {
+                    document.getElementById("searchError").innerHTML = "Search queries must be 3-32 characters long!";
                     return;
                 }
+                var feedURL = "https://gdata.youtube.com/feeds/api/videos?q=" + query + "&max-results=1&output=embed/";
 
-                // Extract the video id from <entry>'s <id> tag
-                video_id = "" + entry_nodes[0].firstChild.nodeValue;
-                video_id = video_id.replace("http://gdata.youtube.com/feeds/api/videos/", "");
+                // Request youtube video result xml feed
+                var x = new XMLHttpRequest();
+                x.open("GET", feedURL, true);
+                x.send();
+                x.onreadystatechange = function () {
+                    if (x.readyState == 4 && x.status == 200) {
+                        var xml_doc = x.responseXML;
 
-                // Iterate until the title is found in the <entry>
-                for (i = 0; i < entry_nodes.length; i++) {
-                    if (entry_nodes[i].nodeName === "title")
-                        video_title = "" + entry_nodes[i].firstChild.nodeValue;
-                }
-                
-                // Make the data received visible to the user and let them add it to queue
-                document.getElementById("vidUrl").value = "" + video_id;
-                document.getElementById("vidTitle").value = "" + video_title;
-                document.getElementById("searchError").innerHTML = "";
-                document.getElementById("addVideo").disabled = false;
+                        var entry_nodes = null;
+                        var video_id = "undefined url/id";
+                        var video_title = "undefined title";
+
+                        // Iterate until the first <entry> to pull data from
+                        for (i = 0; i < xml_doc.documentElement.childNodes.length; i++) {
+                            if (xml_doc.documentElement.childNodes[i].nodeName === "entry")
+                                entry_nodes = xml_doc.documentElement.childNodes[i].childNodes;
+                        }
+
+                        if (entry_nodes == null) {
+                            document.getElementById("searchError").innerHTML = "No search result found!";
+                            return;
+                        }
+
+                        // Extract the video id from <entry>'s <id> tag
+                        video_id = "" + entry_nodes[0].firstChild.nodeValue;
+                        video_id = video_id.replace("http://gdata.youtube.com/feeds/api/videos/", "");
+
+                        // Iterate until the title is found in the <entry>
+                        for (i = 0; i < entry_nodes.length; i++) {
+                            if (entry_nodes[i].nodeName === "title")
+                                video_title = "" + entry_nodes[i].firstChild.nodeValue;
+                        }
+
+                        // Make the data received visible to the user and let them add it to queue
+                        document.getElementById("vidUrl").value = "" + video_id;
+                        document.getElementById("vidTitle").value = "" + video_title;
+                        document.getElementById("searchError").innerHTML = "";
+                        document.getElementById("addVideo").disabled = false;
+                    }
+                };
+
             }
-        };
+        </script>
 
-    }
-</script>
+        <script src="/Scripts/queue.js"></script>
 
-<script src="/Scripts/queue.js"></script>
+        <!-- In browser search tests
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <script src="~/Scripts/qunit-1.18.0.js"></script>
+        <!-- <script src="~/Scripts/searchtest.js"></script>
 
-<!-- In browser search tests 
-<div id="qunit"></div>
-<div id="qunit-fixture"></div>
-<script src="~/Scripts/qunit-1.18.0.js"></script>
-<!-- <script src="~/Scripts/searchtest.js"></script>
-
-<script src="~/Scripts/queueTests.js"</script>
--->
+        <script src="~/Scripts/queueTests.js"</script>
+        -->
 
 
-<h2>Room Chat</h2>
-<div class="container">
-    <input type="text" id="message" />
-    <input type="button" id="sendmessage" value="Send" />
-    <input type="hidden" id="displayname" />
-    <ul id="discussion"></ul>
-</div>
-<script>
-    $(function () {
-        //var chat = $.connection.chatHub;
-        var tHub = $.connection.timerHub;
-        var roomName = 
-        tHub.client.addNewMessageToPage = function (name, message) {
-            $('#discussion').append('<li><strong>' + htmlEncode(name)
-                + '</strong>: ' + htmlEncode(message) + '</li>');
-        };
-        $('#message').focus();
-        $.connection.hub.start().done(function () {
-            $('#sendmessage').click(function () {
-                tHub.server.send('@username', $('#message').val(), document.getElementById("roomName").innerHTML);
-                $('#message').val('').focus();
+        <h2>Room Chat</h2>
+        <div class="container">
+            <input type="text" id="message" />
+            <input type="button" id="sendmessage" value="Send" />
+            <input type="hidden" id="displayname" />
+            <ul id="discussion"></ul>
+        </div>
+        <script>
+            $(function () {
+                //var chat = $.connection.chatHub;
+                var tHub = $.connection.timerHub;
+                var roomName =
+                tHub.client.addNewMessageToPage = function (name, message) {
+                    $('#discussion').append('<li><strong>' + htmlEncode(name)
+                        + '</strong>: ' + htmlEncode(message) + '</li>');
+                };
+                $('#message').focus();
+                $.connection.hub.start().done(function () {
+                    $('#sendmessage').click(function () {
+                        tHub.server.send('@username', $('#message').val(), document.getElementById("roomName").innerHTML);
+                        $('#message').val('').focus();
+                    });
+                });
             });
-        });
-    });
-    function htmlEncode(value) {
-        var encodedValue = $('<div />').text(value).html();
-        return encodedValue;
-    }
-</script>
+            function htmlEncode(value) {
+                var encodedValue = $('<div />').text(value).html();
+                return encodedValue;
+            }
+        </script>
