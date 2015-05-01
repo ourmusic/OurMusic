@@ -22,6 +22,8 @@ $(function () {
         }
     };
 
+    
+
     tHub.client.deleteVideo = function (videoUrl) {
         var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
         $(videoRow).remove();
@@ -169,6 +171,13 @@ $(function () {
 
         var rName = document.getElementById("roomName").innerHTML;
         tHub.server.refreshClient(rName);
+
+        var firstName = document.getElementById("firstName").value;
+        var lastName = document.getElementById("lastName").value;
+        var userID = document.getElementById("currentID").value;
+        tHub.server.announceEntranceToRoom(rName, firstName, lastName, userID);
+
+      
 
         $('#addVideo').click(function () {
             // Call the Send method on the hub.

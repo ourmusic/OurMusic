@@ -8,6 +8,8 @@
     String id = ViewBag.Person.userID.ToString();
     String roomID = ViewBag.Room.roomid.ToString();
     String username = ViewBag.Person.userName.ToString();
+    String firstName = ViewBag.Person.firstName.ToString();
+    String lastName = ViewBag.Person.lastName.ToString();
 }
 <head>
     <title>Room</title>
@@ -75,7 +77,10 @@ else
     <input type="hidden" id="isAdmin" value="no" />
 }
 <input type="hidden" id="currentID" value="@id" />
-<div id="player"></div>
+<input type="hidden" id="adminID" value="@admin" />
+<input type="hidden" id="firstName" value="@firstName" />
+<input type="hidden" id="lastName" value="@lastName" />
+
 <div>
     <div class="col-md-4"></div>
     <div class="col-md-4">

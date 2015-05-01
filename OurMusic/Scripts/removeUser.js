@@ -24,4 +24,30 @@
 
     };
 
+
+    tHub.client.addNewUser = function (firstName, lastName, userID) {
+
+        var li = document.createElement("li");
+        li.className = "list-group-item";
+        var nameString = firstName + " " + lastName;
+        if (document.getElementById("adminID").value == userID) {
+            nameString += " " + "(Administrator)".italics();
+        }
+        li.appendChild(document.createTextNode(nameString));
+
+        var xSpan = document.createElement("SPAN");
+        xSpan.className = "glyphicon glyphicon-remove removeUser";
+        xSpan.setAttribute('data-userID', userID);
+        $(xSpan).css("float", "right");
+        $(xSpan).css("color", "red");
+
+        li.appendChild(xSpan);
+
+        var ul = document.getElementById("userList");
+        ul.appendChild(li);
+
+
+    };
+
+
 });

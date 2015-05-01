@@ -50,6 +50,10 @@ namespace OurMusic.Hubs
 
 
 
+
+
+
+
         public void addToQueue(string vidTitle, string vidUrl, string roomName)
         {
             System.Diagnostics.Debug.WriteLine("addToQueue(" + vidTitle + ", " + vidUrl + ", " + roomName + ")");
@@ -132,10 +136,19 @@ namespace OurMusic.Hubs
                 InitRoom(roomName);
                 jsonOfQueue = rooms[roomName].jsonRoomsQueue();
             }
+            
             Clients.Caller.refreshList(jsonOfQueue);
 
+        }
 
 
+        /**
+         * Each client calls this upon entering a room.  
+         * Other users in that room then know to add this user to their list of room members.
+         **/
+        public void announceEntranceToRoom(string roomName, string firstName, string lastName, Guid userID)
+        {
+            Clients.OthersInGroup(roomName).addNewUser(firstName, lastName, userID);
         }
 
 
