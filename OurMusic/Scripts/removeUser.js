@@ -1,17 +1,18 @@
 ﻿$(function () {
 
+    var rName = document.getElementById("roomName").innerHTML;
+    var tHub = $.connection.timerHub;
     $(document.body).on('click', 'span.removeUser', function () {
 
 
         var userID = this.getAttribute('data-userID');
+        alert("userID set to : " + userID);
 
-        tHub.server.removeUser(userID, roomName);
+        tHub.server.removeUser(userID, rName);
         //alert("userName set to : " + userID);
 
     });
 
-    var tHub = $.connection.timerHub;
-    var rName = document.getElementById("roomName").innerHTML;
     tHub.client.userRemoved = function (uID) {
         if (document.getElementById("currentID").value == uID) {
             tHub.server.leaveRoom(rName);
@@ -29,9 +30,11 @@
 
         var li = document.createElement("li");
         li.className = "list-group-item";
+        li.id = userID;
         var nameString = firstName + " " + lastName;
         if (document.getElementById("adminID").value == userID) {
-            nameString += " " + "(Administrator)".italics();
+            var adminString = "(Administrator)";
+            nameString += " " + adminString.italics();
         }
         li.appendChild(document.createTextNode(nameString));
 

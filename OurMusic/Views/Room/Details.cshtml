@@ -16,6 +16,20 @@
     <!-- For testing-->
     <link href="~/Content/qunit-1.18.0.css" rel="stylesheet" />
 </head>
+
+@if (@admin == @id)
+{
+    <input type="hidden" id="isAdmin" value="admin" />
+}
+else
+{
+    <input type="hidden" id="isAdmin" value="no" />
+}
+<input type="hidden" id="currentID" value="@id" />
+<input type="hidden" id="adminID" value="@admin" />
+<input type="hidden" id="firstName" value="@firstName" />
+<input type="hidden" id="lastName" value="@lastName" />
+
 <p>
     Current user is @id <br/>
     Room admin is @admin <br/>
@@ -40,7 +54,6 @@
                         else if (@admin == @id)
                         {
                             <span class="glyphicon glyphicon-remove removeUser" data-userID="@x.userID" style="float:right;color:red"></span>
-                            <!--<button type="button" class="btn btn-default btn-sm removeUser" value="@id" style="float:right;color:white" ><span class="glyphicon glyphicon-remove red" style="color:red;"></span></button> -->
                         }
                          </li>
                         }
@@ -68,18 +81,7 @@
 
 
 
-@if (@admin == @id)
-{
-    <input type="hidden" id="isAdmin" value="admin" />
-}
-else
-{
-    <input type="hidden" id="isAdmin" value="no" />
-}
-<input type="hidden" id="currentID" value="@id" />
-<input type="hidden" id="adminID" value="@admin" />
-<input type="hidden" id="firstName" value="@firstName" />
-<input type="hidden" id="lastName" value="@lastName" />
+
 
 <div>
     <div class="col-md-4"></div>
@@ -111,10 +113,19 @@ else
                 <tbody id="tbd"></tbody>
             </table>
         </div>
+</div>
+<h2>Room Chat</h2>
+<div class="container">
+    <input type="text" id="message" />
+    <input type="button" id="sendmessage" value="Send" />
+    <input type="hidden" id="displayname" />
+    <ul id="discussion"></ul>
+</div>
 
         <script src="/Scripts/jquery-2.1.3.min.js"></script>
         <script src="/Scripts/jquery.signalR-2.2.0.js"></script>
         <script src="/signalr/hubs"></script>
+        <script src="/Scripts/room.js"></script>
 
         <script type="text/javascript">
             var tag = document.createElement('script');
@@ -235,8 +246,7 @@ else
             }
         </script>
 
-        <script src="/Scripts/queue.js"></script>
-        <script src="/Scripts/removeUser.js"></script>
+        
 
         <!-- In browser search tests
         <div id="qunit"></div>
@@ -248,13 +258,8 @@ else
         -->
 
 
-        <h2>Room Chat</h2>
-        <div class="container">
-            <input type="text" id="message" />
-            <input type="button" id="sendmessage" value="Send" />
-            <input type="hidden" id="displayname" />
-            <ul id="discussion"></ul>
-        </div>
+        
+        
         <script>
             $(function () {
                 //var chat = $.connection.chatHub;

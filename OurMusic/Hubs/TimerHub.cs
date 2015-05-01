@@ -17,10 +17,6 @@ namespace OurMusic.Hubs
     {
         private OurMusicEntities db = new OurMusicEntities();
         public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-
-        //private static Timer _timer = new Timer();
-        //private static VideoQueue videoQueue = new VideoQueue(true);
-
         private static Dictionary<string, PublicRoom> rooms = new Dictionary<string, PublicRoom>();
 
         /// StartInitCountDown COMMENTS OUT OF DATE AS OF 4/20
@@ -48,17 +44,10 @@ namespace OurMusic.Hubs
         }
 
 
-
-
-
-
-
-
         public void addToQueue(string vidTitle, string vidUrl, string roomName)
         {
             System.Diagnostics.Debug.WriteLine("addToQueue(" + vidTitle + ", " + vidUrl + ", " + roomName + ")");
             rooms[roomName].AddToQueue(vidTitle, vidUrl);
-            //PublicRoom.AddToQueue() tells clients about new video
         }
 
 
@@ -90,17 +79,16 @@ namespace OurMusic.Hubs
          **/
         public void removeUser(Guid uID, string roomName)
         {
+            System.Diagnostics.Debug.WriteLine("in RemoveUser.  id set to : " + uID + " and roomName set to : " + roomName);
+            Clients.Group(roomName).userRemoved(uID.ToString());
+
             var user = db.People.Find(uID);
-
             user.activeRoom = null;
-
             db.SaveChangesAsync();
-            Clients.Group(roomName).userRemoved(uID);
         }
 
         public Task leaveRoom(string roomName)
         {
-
             return Groups.Remove(Context.ConnectionId, roomName);
         }
 
@@ -121,7 +109,6 @@ namespace OurMusic.Hubs
          **/
         public async Task refreshClient(string roomName)
         {
-            System.Diagnostics.Debug.WriteLine("refreshClient : " + roomName);
             await Groups.Add(Context.ConnectionId, roomName);
             PublicRoom clientsRoom;
             string jsonOfQueue;
@@ -129,7 +116,6 @@ namespace OurMusic.Hubs
             {
                 clientsRoom.updateContext();
                 jsonOfQueue = clientsRoom.jsonRoomsQueue();
-
             }
             else
             {
@@ -146,7 +132,7 @@ namespace OurMusic.Hubs
          * Each client calls this upon entering a room.  
          * Other users in that room then know to add this user to their list of room members.
          **/
-        public void announceEntranceToRoom(string roomName, string firstName, string lastName, Guid userID)
+        public void announceEntranceToRoom(string roomName, string firstName, string lastName, string userID)
         {
             Clients.OthersInGroup(roomName).addNewUser(firstName, lastName, userID);
         }
