@@ -87,7 +87,8 @@ else
     <div class="col-md-4"></div>
     <div class="col-md-4">
         <input type="text" id="searchQuery" placeholder="Enter Search Query Here" size="35" /><br />
-        <button id="searchButton" onclick="search()">Search Video</button>  <font color="red" id="searchError"></font><br />
+        <button id="searchButton">Search Video</button><br />
+        <font color="red" id="searchError"></font>
         <br />
     </div>
     <div class="col-md-4">
@@ -186,8 +187,8 @@ else
         </script>
 
 
-        <script type="text/javascript">
-            function search() {
+        <script>
+            $('#searchButton').click(function search() {
                 // Reset fields
                 document.getElementById("vidUrl").value = "";
                 document.getElementById("vidTitle").value = "";
@@ -196,70 +197,41 @@ else
 
                 // Load the query into the url
                 var query = document.getElementById("searchQuery").value;
+
                 if (query.length < 3 || query.length > 33) {
                     document.getElementById("searchError").innerHTML = "Search queries must be 3-32 characters long!";
                     return;
                 }
-                var feedURL = "https://gdata.youtube.com/feeds/api/videos?q=" + query + "&max-results=1&output=embed/";
 
-                // Request youtube video result xml feed
-                var x = new XMLHttpRequest();
-                x.open("GET", feedURL, true);
-                x.send();
-                x.onreadystatechange = function () {
-                    if (x.readyState == 4 && x.status == 200) {
-                        var xml_doc = x.responseXML;
-
-                        var entry_nodes = null;
-                        var video_id = "undefined url/id";
-                        var video_title = "undefined title";
-
-                        // Iterate until the first <entry> to pull data from
-                        for (i = 0; i < xml_doc.documentElement.childNodes.length; i++) {
-                            if (xml_doc.documentElement.childNodes[i].nodeName === "entry")
-                                entry_nodes = xml_doc.documentElement.childNodes[i].childNodes;
-                        }
-
-                        if (entry_nodes == null) {
-                            document.getElementById("searchError").innerHTML = "No search result found!";
-                            return;
-                        }
-
-                        // Extract the video id from <entry>'s <id> tag
-                        video_id = "" + entry_nodes[0].firstChild.nodeValue;
-                        video_id = video_id.replace("http://gdata.youtube.com/feeds/api/videos/", "");
-
-                        // Iterate until the title is found in the <entry>
-                        for (i = 0; i < entry_nodes.length; i++) {
-                            if (entry_nodes[i].nodeName === "title")
-                                video_title = "" + entry_nodes[i].firstChild.nodeValue;
-                        }
-
-                        // Make the data received visible to the user and let them add it to queue
-                        document.getElementById("vidUrl").value = "" + video_id;
-                        document.getElementById("vidTitle").value = "" + video_title;
+                // requests JSON for query information
+                var url = "https://www.googleapis.com/youtube/v3/search?videoEmbeddable=true&part=snippet&q=" + query + "&videoCaption=any&type=video&maxResults=1&key=AIzaSyAgKJngiP3aZa6HXQ8QnRMMgn83cy0UUK0";
+                $.getJSON(url, function (data) {
+                    // length > 0 means there is a result. == 0 means garbage
+                    if (data.items.length > 0) {
+                        document.getElementById("vidUrl").value = "" + data.items[0].id.videoId;
+                        document.getElementById("vidTitle").value = "" + data.items[0].snippet.title;
                         document.getElementById("searchError").innerHTML = "";
                         document.getElementById("addVideo").disabled = false;
                     }
-                };
-
-            }
+                    else {
+                        document.getElementById("searchError").innerHTML = "No search result found!";
+                    }
+                });
+            });
         </script>
 
         
 
-        <!-- In browser search tests
+        <!-- In browser search tests -->
         <div id="qunit"></div>
         <div id="qunit-fixture"></div>
         <script src="~/Scripts/qunit-1.18.0.js"></script>
-        <!-- <script src="~/Scripts/searchtest.js"></script>
-
+        <script src="~/Scripts/searchtest.js"></script>
+        <!--
         <script src="~/Scripts/queueTests.js"</script>
         -->
 
 
-        
-        
         <script>
             $(function () {
                 //var chat = $.connection.chatHub;
