@@ -9,6 +9,10 @@ $(function () {
 
     roomName = document.getElementById("roomName").innerHTML;
 
+    /**
+     * Called from server upon connecting and then never again.
+     * Gets a JSON of the Room Queue, and constructs a HTML Table
+     **/
     rHub.client.refreshList = function (jsonString) {
 
         //parse json representation of queue into JavaScript Array of Video objects
@@ -23,12 +27,16 @@ $(function () {
     };
 
 
-
+    //Video Rows are ID'd by their urls, deleteVideo(videoUrl) finds the corresponding row and deletes it.
     rHub.client.deleteVideo = function (videoUrl) {
         var videoRow = document.getElementById("queueList").rows.namedItem(videoUrl);
         $(videoRow).remove();
     };
 
+    /**Called by the sever after a user disconnects or was removed.
+     * If calling client is the removed user, they are notified.
+     * If not removed user, deletes user from user list.
+     */
     rHub.client.userRemoved = function (uID) {
        
         var myID = document.getElementById("currentID").value;
@@ -45,15 +53,26 @@ $(function () {
 
     };
 
+    /**
+     * moved addUser to global namespace, similar to addRow
+     * adds user to userlist after they join the room.
+     */
     rHub.client.addNewUser = function (firstName, lastName, userID) {
         addUser(firstName, lastName, userID);
     };
 
+    /**
+     * When the admin deletes a room, this notifies room members that the room won't work anymore.
+     */
     rHub.client.alertRoomHasBeenDeleted = function () {
         alert("Room " + roomName + " has been deleted by the administrator.  This room is no longer functional. :(");
     };
 
 
+    /**
+     * Called by the server after the server adjusts the queue after a vote.
+     * param movement tells client how to move the row corresponding to that video.
+     */
     rHub.client.adjustVotesAndPlacement = function (videoUrl, votesChange, movement) {
 
         if (movement == -999) return;
@@ -78,6 +97,7 @@ $(function () {
 
     };
 
+    //Binds remove user button to call server removeUser
     $(document.body).on('click', 'span.removeUser', function () {
 
 
@@ -87,7 +107,7 @@ $(function () {
 
     });
 
-
+    //binds remove video button to call server deleteVideo
     $(document.body).on('click', 'button.delete', function () {
 
         var row = this.parentNode.parentNode;
@@ -100,6 +120,7 @@ $(function () {
 
     });
 
+    //binds upvote to notify server and adjust this users row button color
     $(document.body).on('click', 'button.upvote', function () {
 
 
@@ -145,7 +166,7 @@ $(function () {
     });
 
 
-
+    //binds downvote to notify server, and adjusts this user's row
     $(document.body).on('click', 'button.downvote', function () {
 
         var row = this.parentNode.parentNode;
@@ -186,6 +207,7 @@ $(function () {
 
     });
 
+    //called by server, calls global addRow to add row to queue in HTML table
     rHub.client.addVideo = function (vidTitle, vidURL) {
         addRow(vidTitle, vidURL, 0);
     };
@@ -216,11 +238,9 @@ $(function () {
 
 });
 
-function deleteRow(r) {
-    var i = r.parentNode.parentNode.rowIndex;
-    document.getElementById("myTable").deleteRow(i);
-};
-
+/**
+ * no server functionality, helper function to add HTML 'li' for a user that joins the room
+ */
 function addUser(firstName, lastName, userID) {
 
     var li = document.createElement("li");
@@ -249,6 +269,9 @@ function addUser(firstName, lastName, userID) {
 
 };
 
+/**
+ * no server functionality, helper function to add a row (video) to html table representing the queue
+ */
 function addRow(title, url, votes) {
     var table = document.getElementById('queueList');
     var rowCount = table.rows.length;
