@@ -30,13 +30,11 @@ else
 <input type="hidden" id="firstName" value="@firstName" />
 <input type="hidden" id="lastName" value="@lastName" />
 
-<p>
-    Current user is @id <br/>
-    Room admin is @admin <br/>
-    Room id is @roomID
-</p>
+@if (@admin == @id)
+{
+    @Html.ActionLink("DELETE ROOM", "Delete", "Room", new { id = ViewBag.Room.roomid }, new { })
+}
 
-@Html.ActionLink("DELETE ROOM", "Delete", "Room", new { id = ViewBag.Room.roomid }, new { })
 <div class="row">
     <center><h1 id="roomName">@Model.name</h1></center>
     <div class="col-lg-4">
@@ -79,10 +77,6 @@ else
     </div>
 </div>
 
-
-
-
-
 <div>
     <div class="col-md-4"></div>
     <div class="col-md-4">
@@ -115,7 +109,8 @@ else
             </table>
         </div>
 </div>
-<h2>Room Chat</h2>
+
+<h3>Chat</h3>
 <div class="container">
     <input type="text" id="message" />
     <input type="button" id="sendmessage" value="Send" />
@@ -123,134 +118,134 @@ else
     <ul id="discussion"></ul>
 </div>
 
-        <script src="/Scripts/jquery-2.1.3.min.js"></script>
-        <script src="/Scripts/jquery.signalR-2.2.0.js"></script>
-        <script src="/signalr/hubs"></script>
-        <script src="/Scripts/room.js"></script>
+<script src="/Scripts/jquery-2.1.3.min.js"></script>
+<script src="/Scripts/jquery.signalR-2.2.0.js"></script>
+<script src="/signalr/hubs"></script>
+<script src="/Scripts/room.js"></script>
 
-        <script type="text/javascript">
-            var tag = document.createElement('script');
+<script type="text/javascript">
+    var tag = document.createElement('script');
 
-            tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-            var player;
-            var time;
+    var player;
+    var time;
 
-            function onYouTubeIframeAPIReady() {
-                player = new YT.Player('player', {
-                    height: '390',
-                    width: '640',
-                    videoId: 'zjQlCbshk1A',
-                    events: { 'onReady': onPlayerReady }
-                });
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '390',
+            width: '640',
+            videoId: 'zjQlCbshk1A',
+            events: { 'onReady': onPlayerReady }
+        });
+    }
+
+    function onPlayerReady(event) {
+        event.target.playVideo(); 
+    }
+
+    
+    $(function () {
+        var prox = $.connection.timerHub;
+
+
+        var admin = '@admin';
+        var id = '@id';
+        var guid = '@Model.name';
+
+        function init() {
+            if (admin == id) {
+                time = player.getDuration();
+                prox.server.startInitCountDown(time, guid);
+            } else {
+                player.playVideo();
             }
+        }
 
-            function onPlayerReady(event) {
-                event.target.playVideo(); // this is kept generic so the same callback can be used with any player object
+        prox.client.change = function (video) {
+            player.loadVideoById(video);
+            if (admin == id) {
+                setTimeout(getTime, 2000);
             }
+            document.getElementById("queueList").deleteRow(1);
+        }
 
-            //This is where the server-client code goes
-            $(function () {
-                var prox = $.connection.timerHub;
+        function getTime() {
+            time = player.getDuration();
+            prox.server.countDown(time, guid);
+        }
 
-
-                var admin = '@admin';
-                var id = '@id';
-                var guid = '@Model.name';
-
-                function init() {
-                    if (admin == id) {
-                        time = player.getDuration();
-                        prox.server.startInitCountDown(time, guid);
-                    } else {
-                        player.playVideo();
-                    }
-                }
-
-                prox.client.change = function (video) {
-                    player.loadVideoById(video);
-                    if (admin == id) {
-                        setTimeout(getTime, 2000);
-                    }
-                    document.getElementById("queueList").deleteRow(1);
-                }
-
-                function getTime() {
-                    time = player.getDuration();
-                    prox.server.countDown(time, guid);
-                }
-
-                $.connection.hub.start().done(init);
-            });
-        </script>
+        $.connection.hub.start().done(init);
+    });
+</script>
 
 
-        <script>
-            $('#searchButton').click(function search() {
-                // Reset fields
-                document.getElementById("vidUrl").value = "";
-                document.getElementById("vidTitle").value = "";
+<script>
+    $('#searchButton').click(function search() {
+        // Reset fields
+        document.getElementById("vidUrl").value = "";
+        document.getElementById("vidTitle").value = "";
+        document.getElementById("searchError").innerHTML = "";
+        document.getElementById("addVideo").disabled = true;
+
+        // Load the query into the url
+        var query = document.getElementById("searchQuery").value;
+
+        if (query.length < 3 || query.length > 33) {
+            document.getElementById("searchError").innerHTML = "Search queries must be 3-32 characters long!";
+            return;
+        }
+
+        // requests JSON for query information
+        var url = "https://www.googleapis.com/youtube/v3/search?videoEmbeddable=true&part=snippet&q=" + query + "&videoCaption=any&type=video&maxResults=1&key=AIzaSyAgKJngiP3aZa6HXQ8QnRMMgn83cy0UUK0";
+        $.getJSON(url, function (data) {
+            // length > 0 means there is a result. == 0 means garbage
+            if (data.items.length > 0) {
+                document.getElementById("vidUrl").value = "" + data.items[0].id.videoId;
+                document.getElementById("vidTitle").value = "" + data.items[0].snippet.title;
                 document.getElementById("searchError").innerHTML = "";
-                document.getElementById("addVideo").disabled = true;
-
-                // Load the query into the url
-                var query = document.getElementById("searchQuery").value;
-
-                if (query.length < 3 || query.length > 33) {
-                    document.getElementById("searchError").innerHTML = "Search queries must be 3-32 characters long!";
-                    return;
-                }
-
-                // requests JSON for query information
-                var url = "https://www.googleapis.com/youtube/v3/search?videoEmbeddable=true&part=snippet&q=" + query + "&videoCaption=any&type=video&maxResults=1&key=AIzaSyAgKJngiP3aZa6HXQ8QnRMMgn83cy0UUK0";
-                $.getJSON(url, function (data) {
-                    // length > 0 means there is a result. == 0 means garbage
-                    if (data.items.length > 0) {
-                        document.getElementById("vidUrl").value = "" + data.items[0].id.videoId;
-                        document.getElementById("vidTitle").value = "" + data.items[0].snippet.title;
-                        document.getElementById("searchError").innerHTML = "";
-                        document.getElementById("addVideo").disabled = false;
-                    }
-                    else {
-                        document.getElementById("searchError").innerHTML = "No search result found!";
-                    }
-                });
-            });
-        </script>
+                document.getElementById("addVideo").disabled = false;
+            }
+            else {
+                document.getElementById("searchError").innerHTML = "No search result found!";
+            }
+        });
+    });
+</script>
 
         
 
-        <!-- In browser search tests
-        <div id="qunit"></div>
-        <div id="qunit-fixture"></div>
-        <script src="~/Scripts/qunit-1.18.0.js"></script>
-        <script src="~/Scripts/searchtest.js"></script>
-        <!--
-        <script src="~/Scripts/queueTests.js"</script>
-        -->
+<!-- In browser search tests
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="~/Scripts/qunit-1.18.0.js"></script>
+<script src="~/Scripts/searchtest.js"></script>
+<!--
+<script src="~/Scripts/queueTests.js"</script>
+-->
 
 
-        <script>
-            $(function () {
-                //var chat = $.connection.chatHub;
-                var tHub = $.connection.timerHub;
-                //var roomName =
-                tHub.client.addNewMessageToPage = function (name, message) {
-                    $('#discussion').append('<li><strong>' + htmlEncode(name)
-                        + '</strong>: ' + htmlEncode(message) + '</li>');
-                };
-                $('#message').focus();
-                $.connection.hub.start().done(function () {
-                    $('#sendmessage').click(function () {
-                        tHub.server.send('@username', $('#message').val(), document.getElementById("roomName").innerHTML);
-                        $('#message').val('').focus();
-                    });
-                });
+<script>
+    $(function () {
+        //var chat = $.connection.chatHub;
+        var tHub = $.connection.timerHub;
+        //var roomName =
+        tHub.client.addNewMessageToPage = function (name, message) {
+            $('#discussion').append('<li><strong>' + htmlEncode(name)
+                + '</strong>: ' + htmlEncode(message) + '</li>');
+        };
+        $('#message').focus();
+        $.connection.hub.start().done(function () {
+            $('#sendmessage').click(function () {
+                tHub.server.send('@username', $('#message').val(), document.getElementById("roomName").innerHTML);
+                $('#message').val('').focus();
             });
-            function htmlEncode(value) {
-                var encodedValue = $('<div />').text(value).html();
-                return encodedValue;
-            }
-        </script>
+        });
+    });
+    function htmlEncode(value) {
+        var encodedValue = $('<div />').text(value).html();
+        return encodedValue;
+    }
+</script>

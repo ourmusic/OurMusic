@@ -12,7 +12,6 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace OurMusic.Hubs
 {
-    //[HubName("timerHub")]
     public class TimerHub : Hub
     {
         private OurMusicEntities db = new OurMusicEntities();
@@ -43,7 +42,12 @@ namespace OurMusic.Hubs
             }
         }
 
-
+        /// <summary>
+        /// Adds a song to the queue
+        /// </summary>
+        /// <param name="vidTitle">Video Title</param>
+        /// <param name="vidUrl">Video URL</param>
+        /// <param name="roomName">The room which the video will be played in</param>
         public void addToQueue(string vidTitle, string vidUrl, string roomName)
         {
             System.Diagnostics.Debug.WriteLine("addToQueue(" + vidTitle + ", " + vidUrl + ", " + roomName + ")");
@@ -52,11 +56,16 @@ namespace OurMusic.Hubs
 
 
 
-        /**
-         * called by a client, must specify roomName of existing room.
-         * changes the vote score for specified video by voteChange
-         * updates the queue, and then tells all members of that group what to change in their queues
-         **/
+
+        /// <summary>
+        /// called by a client, must specify roomName of existing room.
+        /// changes the vote score for specified video by voteChange
+        /// updates the queue, and then tells all members of that group what to change in their queues
+        /// </summary>
+        /// <param name="vidTitle">Video Title</param>
+        /// <param name="vidUrl">Video URL</param>
+        /// <param name="voteChange">Upvote or Downvote</param>
+        /// <param name="roomName">The room which the video will be played in</param>
         public void voteByTitleAndUrl(string vidTitle, string vidUrl, int voteChange, string roomName)
         {
             System.Diagnostics.Debug.WriteLine("in voteByTitleAndUrl, roomname = " + roomName + ".");
@@ -66,17 +75,25 @@ namespace OurMusic.Hubs
 
         }
 
+        /// <summary>
+        /// Removes video from queue
+        /// </summary>
+        /// <param name="videoTitle">Video to delete</param>
+        /// <param name="videoURL">Video URL</param>
+        /// <param name="roomName">Room which video persides</param>
         public void deleteVideo(string videoTitle, string videoURL, string roomName)
         {
             rooms[roomName].deleteVideo(videoTitle, videoURL);
             Clients.Group(roomName).deleteVideo(videoURL);
         }
 
-        /**
-         * called by room administrator's javascript
-         * updates removed user from db, and notifies room that user was removed
-         * the removed user will have to make a separate call to remove himself from the group
-         **/
+        /// <summary>
+        /// called by room administrator's javascript
+        /// updates removed user from db, and notifies room that user was removed
+        /// the removed user will have to make a separate call to remove himself from the group
+        /// </summary>
+        /// <param name="uID">User's ID to be removed from the room</param>
+        /// <param name="roomName">Room which user will be removed from</param>
         public void removeUser(Guid uID, string roomName)
         {
             System.Diagnostics.Debug.WriteLine("in RemoveUser.  id set to : " + uID + " and roomName set to : " + roomName);
@@ -87,26 +104,33 @@ namespace OurMusic.Hubs
             db.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Function called when person leaves
+        /// </summary>
+        /// <param name="roomName">Room which person is leaving</param>
+        /// <returns></returns>
         public Task leaveRoom(string roomName)
         {
             return Groups.Remove(Context.ConnectionId, roomName);
         }
 
-        public void Hello()
-        {
-            Clients.All.hello();
-        }
+        /// <summary>
+        /// Adds a message to the room
+        /// </summary>
+        /// <param name="name">User's name</param>
+        /// <param name="message">The message to send</param>
+        /// <param name="roomName">The room to send the message to</param>
         public void Send(String name, String message, string roomName)
         {
             Clients.Group(roomName).addNewMessageToPage(name, message);
         }
 
 
-        /**
-         * This implements the generic JoinRoom function
-         * If room already exists, then retrieves that room's queue, and sends back a json of it to requesting client.
-         * If room doesn't exist, adds it to dictionary and groups
-         **/
+        /// <summary>
+        /// Refreshes the queue
+        /// </summary>
+        /// <param name="roomName">Room to refresh</param>
+        /// <returns></returns>
         public async Task refreshClient(string roomName)
         {
             await Groups.Add(Context.ConnectionId, roomName);
@@ -128,10 +152,13 @@ namespace OurMusic.Hubs
         }
 
 
-        /**
-         * Each client calls this upon entering a room.  
-         * Other users in that room then know to add this user to their list of room members.
-         **/
+        /// <summary>
+        /// Allows the room to know who that a user entered
+        /// </summary>
+        /// <param name="roomName">Room which user is entering</param>
+        /// <param name="firstName">User's first name</param>
+        /// <param name="lastName">User's last name</param>
+        /// <param name="userID">User's ID</param>
         public void announceEntranceToRoom(string roomName, string firstName, string lastName, string userID)
         {
             Clients.OthersInGroup(roomName).addNewUser(firstName, lastName, userID);
@@ -139,11 +166,12 @@ namespace OurMusic.Hubs
 
 
 
-        //NEW MOTHODS FOR ROOMS
+        /// <summary>
+        /// Initializes the room
+        /// </summary>
+        /// <param name="guid">The room to initialize</param>
         public void InitRoom(String guid)
         {
-            //Need to check if this guid had already been used
-            //This part relies on how you implement the data structure, Jake.
             System.Diagnostics.Debug.WriteLine("In InitRoom(" + guid + ")");
             if (!rooms.ContainsKey(guid))
             {
@@ -155,9 +183,13 @@ namespace OurMusic.Hubs
 
         }
 
+        /// <summary>
+        /// Starts the countdown
+        /// </summary>
+        /// <param name="seconds"></param>
+        /// <param name="guid"></param>
         public void CountDown(int seconds, String guid)
         {
-            //Find room with guid and start the countdown.
             System.Diagnostics.Debug.WriteLine("THub CountDown(" + guid + ", " + seconds + ")");
             rooms[guid].CountDown(seconds);
         }
