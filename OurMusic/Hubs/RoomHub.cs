@@ -21,18 +21,24 @@ namespace OurMusic.Hubs
         private static ConcurrentDictionary<string, Tuple<string, string>> connections2usersANDgroups = new ConcurrentDictionary<string, Tuple<string, string>>();
 
 
+        /**
+         * static method called by IHubContext in RoomController
+         * when the admin deletes the room, this notifies all current room members
+         */
         public static void alertRoomHasBeenDeleted(string roomName)
         {
             var notifyContext = GlobalHost.ConnectionManager.GetHubContext<RoomHub>();
             notifyContext.Clients.Group(roomName).alertRoomHasBeenDeleted();
         }
 
-        /// StartInitCountDown COMMENTS OUT OF DATE AS OF 4/20
+        
         /// <summary>
         /// Room admin starts the counter.
         /// Also adds the ElapsedEventHandler
         /// </summary>
         /// <param name="seconds">Number of seconds for the first video</param>
+        /// Finds the room in the dictionary with key roomName, and starts the countdown.
+        /// Initializes the room if it has not been yet.
         public void StartInitCountDown(int seconds, string roomName)
         {
             System.Diagnostics.Debug.WriteLine("In StartInitCountDown");
@@ -63,6 +69,9 @@ namespace OurMusic.Hubs
             rooms[roomName].AddToQueue(vidTitle, vidUrl);
         }
 
+        /**
+         * User list must constantly be updated, on disconnect events, this notifies clients to remove that user from their user list
+         */
         public override Task OnDisconnected(bool stopCalled)
         {
 
@@ -150,9 +159,11 @@ namespace OurMusic.Hubs
 
 
         /// <summary>
-        /// Refreshes the queue
+        /// Called upon connecting.
+        /// Refreshes the queue for the calling client, and updates connections2usersANDgroups dictionary.
         /// </summary>
         /// <param name="roomName">Room to refresh</param>
+        /// <param userID="userID">user ID to map to connectionID</param>
         /// <returns></returns>
         public async Task refreshClient(string roomName, string userID)
         {
