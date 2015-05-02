@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
@@ -12,11 +13,19 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace OurMusic.Hubs
 {
-    public class TimerHub : Hub
+    public class RoomHub : Hub
     {
         private OurMusicEntities db = new OurMusicEntities();
         public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
         private static Dictionary<string, PublicRoom> rooms = new Dictionary<string, PublicRoom>();
+        private static ConcurrentDictionary<string, Tuple<string, string>> connections2usersANDgroups = new ConcurrentDictionary<string, Tuple<string, string>>();
+
+
+        public static void alertRoomHasBeenDeleted(string roomName)
+        {
+            var notifyContext = GlobalHost.ConnectionManager.GetHubContext<RoomHub>();
+            notifyContext.Clients.Group(roomName).alertRoomHasBeenDeleted();
+        }
 
         /// StartInitCountDown COMMENTS OUT OF DATE AS OF 4/20
         /// <summary>
@@ -52,6 +61,20 @@ namespace OurMusic.Hubs
         {
             System.Diagnostics.Debug.WriteLine("addToQueue(" + vidTitle + ", " + vidUrl + ", " + roomName + ")");
             rooms[roomName].AddToQueue(vidTitle, vidUrl);
+        }
+
+        public override Task OnDisconnected(bool stopCalled)
+        {
+
+                Tuple<string, string> IdRoomNameTuple;
+                if (connections2usersANDgroups.TryRemove(Context.ConnectionId, out IdRoomNameTuple))
+                {
+                    string userID = IdRoomNameTuple.Item1;
+                    string roomName = IdRoomNameTuple.Item2;
+                    Clients.Group(roomName).userRemoved(userID);
+                }
+
+            return base.OnDisconnected(stopCalled);
         }
 
 
@@ -131,9 +154,10 @@ namespace OurMusic.Hubs
         /// </summary>
         /// <param name="roomName">Room to refresh</param>
         /// <returns></returns>
-        public async Task refreshClient(string roomName)
+        public async Task refreshClient(string roomName, string userID)
         {
             await Groups.Add(Context.ConnectionId, roomName);
+            connections2usersANDgroups.TryAdd(Context.ConnectionId, new Tuple<string, string>(userID, roomName));
             PublicRoom clientsRoom;
             string jsonOfQueue;
             if (rooms.TryGetValue(roomName, out clientsRoom))

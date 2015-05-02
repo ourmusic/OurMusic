@@ -21,7 +21,7 @@ namespace OurMusic.Controllers
         private OurMusicEntities db = new OurMusicEntities();
         public static UserManager<ApplicationUser> umanager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
         private string LOGGEDIN_USER;
-        private IHubContext _context = GlobalHost.ConnectionManager.GetHubContext<TimerHub>();
+        private IHubContext _context = GlobalHost.ConnectionManager.GetHubContext<RoomHub>();
         // GET: /Room/
         public async Task<ActionResult> Index()
         {
@@ -138,7 +138,7 @@ namespace OurMusic.Controllers
         {
             Room room = await db.Rooms.FindAsync(id);
 
-
+            string roomName = room.name;
             var users = db.People.Where(x => x.activeRoom == room.roomid);
             foreach (var user in users)
                 user.activeRoom = null;
@@ -147,6 +147,7 @@ namespace OurMusic.Controllers
 
             db.Rooms.Remove(room);
             await db.SaveChangesAsync();
+            RoomHub.alertRoomHasBeenDeleted(roomName);
             return RedirectToAction("Index");
         }
 

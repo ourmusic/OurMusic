@@ -148,7 +148,7 @@ else
 
     
     $(function () {
-        var prox = $.connection.timerHub;
+        var prox = $.connection.roomHub;
 
 
         var admin = '@admin';
@@ -230,7 +230,7 @@ else
 <script>
     $(function () {
         //var chat = $.connection.chatHub;
-        var tHub = $.connection.timerHub;
+        var tHub = $.connection.roomHub;
         //var roomName =
         tHub.client.addNewMessageToPage = function (name, message) {
             $('#discussion').append('<li><strong>' + htmlEncode(name)

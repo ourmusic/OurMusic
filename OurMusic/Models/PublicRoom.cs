@@ -15,7 +15,7 @@ namespace OurMusic.Models
         private String _roomID;
         private VideoQueue _queue;
         private static Timer _timer = new Timer();
-        private IHubContext _context = GlobalHost.ConnectionManager.GetHubContext<TimerHub>();
+        private IHubContext _context = GlobalHost.ConnectionManager.GetHubContext<RoomHub>();
 
         public PublicRoom(String guid)
         {
@@ -79,7 +79,7 @@ namespace OurMusic.Models
 
         public void updateContext()
         {
-            _context = GlobalHost.ConnectionManager.GetHubContext<TimerHub>();
+            _context = GlobalHost.ConnectionManager.GetHubContext<RoomHub>();
 
         }
 
