@@ -7,11 +7,9 @@ namespace OurMusic.Models
 {
     public class Video
     {
-        //may need to change these variables to be public
+        //these member variables must be public for json serialization
         public string title;        //title of the video 
         public string url;          //url of the video
-        //private string artist;       //artist of the video
-        // private string album;        //album of the video
         public int votes;           //votes to determine play order
 
         /// <summary>

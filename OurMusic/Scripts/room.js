@@ -140,15 +140,12 @@ $(function () {
 
         if (row.value == "neutral") {
             row.value = "up";
-            //votesCell.innerHTML = oldVotes + 1;
-
             $(upGlyphSpan).css("color", "#FF9933");
             // alert("neutral to up!  rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
             rHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1, roomName);
         }
         else if (row.value == "up") {
             row.value = "neutral";
-            //votesCell.innerHTML = oldVotes - 1;
             $(upGlyphSpan).css("color", "#FFFFFF");
             // alert("up to neutral! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
             rHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1, roomName);
@@ -156,7 +153,6 @@ $(function () {
         else {
             //currently downvoted
             row.value = "up";
-            //votesCell.innerHTML = oldVotes + 2;
             $(upGlyphSpan).css("color", "#FF9933");
             $(downGlyphSpan).css("color", "#FFFFFF");
             // alert("down to up! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
@@ -184,14 +180,12 @@ $(function () {
 
         if (row.value == "neutral") {
             row.value = "down";
-            //votesCell.innerHTML = oldVotes - 1;
             $(downGlyphSpan).css("color", "#33CCFF");
             // alert("neutral to down!  rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
             rHub.server.voteByTitleAndUrl(videoTitle, videoURL, -1, roomName);
         }
         else if (row.value == "down") {
             row.value = "neutral";
-            //votesCell.innerHTML = oldVotes + 1;
             $(downGlyphSpan).css("color", "#FFFFFF");
             //alert("down to neutral! rowIndex: " + rowIndex + " videoTitle: " + videoTitle + " videoURL: " + videoURL + " oldVotes: " + oldVotes);
             rHub.server.voteByTitleAndUrl(videoTitle, videoURL, 1, roomName);
